@@ -1,0 +1,228 @@
+---
+---
+<div id="loading-transition" class="fixed inset-0 z-50 hidden opacity-0 transition-all duration-500">
+    <!-- Fondo animado con degradado -->
+    <div class="absolute inset-0 bg-gradient-to-br from-purple-600 via-pink-500 to-indigo-600 opacity-90">
+      <div class="absolute inset-0 opacity-20">
+        <div class="firefly-container">
+          <div class="fireflies"></div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Contenido central -->
+    <div class="absolute inset-0 flex items-center justify-center">
+      <div class="flex flex-col items-center transform transition-all duration-700">
+        <!-- Logo con animación -->
+        <div class="relative mb-6">
+          <div class="absolute inset-0 bg-white blur-xl rounded-full opacity-20 scale-150 animate-pulse"></div>
+          <h1 class="text-5xl sm:text-6xl font-bold bg-gradient-to-r from-white to-purple-100 bg-clip-text text-transparent relative z-10">
+            TellMe
+          </h1>
+        </div>
+        
+        <!-- Animación de carga principal -->
+        <div class="relative">
+          <div class="loader-ring">
+            <div class="loader-ring-light"></div>
+            <div class="loader-ring-track"></div>
+          </div>
+          
+          <!-- Indicadores de carga secundarios -->
+          <div class="flex space-x-3 mt-8 items-center justify-center">
+            <div class="w-2.5 h-2.5 rounded-full bg-white opacity-80 animate-ping" style="animation-duration: 1.5s; animation-delay: 0s"></div>
+            <div class="w-2.5 h-2.5 rounded-full bg-white opacity-80 animate-ping" style="animation-duration: 1.5s; animation-delay: 0.3s"></div>
+            <div class="w-2.5 h-2.5 rounded-full bg-white opacity-80 animate-ping" style="animation-duration: 1.5s; animation-delay: 0.6s"></div>
+          </div>
+        </div>
+        
+        <!-- Mensaje de carga -->
+        <p class="text-white text-opacity-80 mt-6 text-sm font-medium tracking-wider animate-fadeIn">
+          Conectando tu mundo...
+        </p>
+      </div>
+    </div>
+  </div>
+  
+  <style>
+    /* Animaciones personalizadas */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    @keyframes rotating {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    
+    @keyframes floatingUpDown {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    @keyframes flicker {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    /* Efecto de partículas (fireflies) */
+    .firefly-container {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+    
+    .fireflies::before,
+    .fireflies::after {
+      content: "";
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background-color: white;
+      opacity: 0;
+      animation: flicker 3s infinite, floatingUpDown 6s infinite;
+    }
+    
+    .fireflies::before {
+      top: 30%;
+      left: 20%;
+      animation-delay: 0s, 1s;
+    }
+    
+    .fireflies::after {
+      top: 70%;
+      left: 80%;
+      animation-delay: 1.5s, 0s;
+    }
+  
+    /* Anillo de carga principal */
+    .loader-ring {
+      position: relative;
+      width: 60px;
+      height: 60px;
+    }
+  
+    .loader-ring-light {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      box-shadow: 0 4px 0 #ffffff inset;
+      animation: rotating 1s linear infinite;
+    }
+  
+    .loader-ring-track {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      border-radius: 50%;
+      box-shadow: 0 0 8px 2px rgba(255, 255, 255, 0.5) inset;
+    }
+    
+    /* Estados del componente */
+    #loading-transition.active {
+      display: flex;
+      opacity: 1;
+    }
+    
+    .animate-fadeIn {
+      animation: fadeIn 1s ease-in-out forwards;
+    }
+  </style>
+  
+  <script>
+    let isTransitioning = false;
+    
+    export function showTransition() {
+      if (isTransitioning) return;
+      isTransitioning = true;
+      
+      const transition = document.getElementById('loading-transition');
+      if (!transition) return;
+      
+      // Mostrar y animar la transición
+      transition.classList.add('active');
+      
+      // Crear partículas adicionales dinámicamente
+      addParticles();
+    }
+    
+    export function hideTransition() {
+      const transition = document.getElementById('loading-transition');
+      if (!transition) return;
+      
+      // Ocultar con animación suave
+      transition.style.opacity = '0';
+      
+      setTimeout(() => {
+        transition.classList.remove('active');
+        transition.style.opacity = '';
+        isTransitioning = false;
+      }, 500);
+    }
+
+    // Función para navegar entre páginas con transición
+    export function navigateTo(url: string) {
+      if (isTransitioning) return;
+      
+      showTransition();
+      
+      setTimeout(() => {
+        window.location.href = url;
+      }, 600);
+    }
+    
+    // Añadir la función al objeto global window para poder accederla desde cualquier página
+    // @ts-ignore - Añadimos esta propiedad al objeto window
+    window.navigateTo = navigateTo;
+    // @ts-ignore - Añadimos las funciones de transición al objeto window
+    window.showTransition = showTransition;
+    // @ts-ignore
+    window.hideTransition = hideTransition;
+    
+    // Añadir listeners a los enlaces para usar la transición
+    document.addEventListener('DOMContentLoaded', () => {
+      // Elementos de navegación internos
+      const internalLinks = document.querySelectorAll('a[href^="/"]');
+      
+      internalLinks.forEach(link => {
+        link.addEventListener('click', (e: Event) => {
+          // No interceptar enlaces con target="_blank" o clicks con modifier keys
+          const linkElement = link as HTMLAnchorElement;
+          const mouseEvent = e as MouseEvent;
+          if (linkElement.target === '_blank' || mouseEvent.ctrlKey || mouseEvent.metaKey) return;
+          
+          e.preventDefault();
+          navigateTo(linkElement.getAttribute('href') || '/');
+        });
+      });
+    });
+    
+    // Función para crear partículas adicionales
+    function addParticles() {
+      const container = document.querySelector('.fireflies');
+      if (!container) return;
+      
+      for (let i = 0; i < 15; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'firefly';
+        particle.style.position = 'absolute';
+        particle.style.width = '3px';
+        particle.style.height = '3px';
+        particle.style.backgroundColor = 'white';
+        particle.style.borderRadius = '50%';
+        particle.style.top = `${Math.random() * 100}%`;
+        particle.style.left = `${Math.random() * 100}%`;
+        particle.style.opacity = `${Math.random() * 0.5 + 0.2}`;
+        particle.style.animation = `
+          flicker ${Math.random() * 3 + 2}s infinite, 
+          floatingUpDown ${Math.random() * 6 + 4}s infinite
+        `;
+        particle.style.animationDelay = `${Math.random() * 5}s, ${Math.random() * 5}s`;
+        
+        container.appendChild(particle);
+      }
+    }
+  </script>

@@ -1,0 +1,827 @@
+---
+import Layout from '../layouts/Layout.astro';
+import LoadingTransition from '../components/LoadingTransition.astro';
+---
+<LoadingTransition />
+<Layout title="TellMe - Feed">
+  <!-- Añadir meta tag para asegurar UTF-8 -->
+  <meta charset="UTF-8" slot="head"/>
+  <div class="min-h-screen bg-gray-100">
+    <!-- Navbar estilo Facebook -->
+    <nav class="bg-white shadow-md fixed w-full top-0 z-50 border-b border-gray-200">
+      <div class="max-w-7xl mx-auto px-4">
+        <div class="flex justify-between items-center h-14">
+          <div class="flex items-center">
+            <h1 class="text-2xl font-bold text-blue-600">TellMe</h1>
+            <div class="ml-4 relative">
+              <input 
+                type="text" 
+                placeholder="Buscar en TellMe" 
+                class="bg-gray-100 rounded-full py-1.5 pl-9 pr-3 text-sm w-60 focus:outline-none"
+              >
+              <svg class="h-4 w-4 text-gray-500 absolute left-3 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+          </div>
+          
+          <div class="flex items-center space-x-1">
+            <a href="/profile" class="p-2 rounded-full hover:bg-gray-200 transition-colors">
+              <span class="sr-only">Perfil</span>
+              <svg class="h-6 w-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            </a>
+            <button id="logoutBtn" class="p-2 rounded-full hover:bg-gray-200 transition-colors">
+              <svg class="h-6 w-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content con 3 columnas -->
+    <main class="pt-16 pb-8">
+      <div class="max-w-7xl mx-auto px-4 flex">
+        <!-- Barra lateral izquierda -->
+        <div class="hidden lg:block w-1/4 pr-4">
+          <div class="bg-white rounded-lg shadow-sm p-4 mb-4">
+            <ul class="space-y-1">
+              <li>
+                <a href="/profile" class="flex items-center p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                  <div class="h-9 w-9 rounded-full bg-blue-600 flex-shrink-0 mr-3"></div>
+                  <span class="text-gray-800">Mi Perfil</span>
+                </a>
+              </li>
+              <li>
+                <a href="#" class="flex items-center p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                  <svg class="h-9 w-9 text-blue-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                  <span class="text-gray-800">Amigos</span>
+                </a>
+              </li>
+              <li>
+                <a href="#" class="flex items-center p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                  <svg class="h-9 w-9 text-blue-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span class="text-gray-800">Recientes</span>
+                </a>
+              </li>
+              <li>
+                <a href="#" class="flex items-center p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                  <svg class="h-9 w-9 text-blue-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                  </svg>
+                  <span class="text-gray-800">Guardados</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        
+        <!-- Contenido central -->
+        <div class="w-full lg:w-2/4 px-0 lg:px-4">
+          <!-- Create Post -->
+          <div class="bg-white rounded-lg shadow-sm p-4 mb-4">
+            <div class="flex items-center space-x-4 mb-4">
+              <div class="h-10 w-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600"></div>
+              <button class="w-full px-4 py-2.5 border border-gray-300 rounded-full bg-gray-100 text-left text-gray-500 hover:bg-gray-200 transition-colors text-sm" id="openPostModal">
+                ¿Que estas pensando?
+              </button>
+            </div>
+            <div class="flex justify-between items-center border-t border-gray-200 pt-3">
+              <button class="flex items-center px-2 py-1.5 rounded-lg hover:bg-gray-100 transition-colors text-sm" id="uploadMediaBtn">
+                <svg class="h-6 w-6 mr-2 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                Foto/Video
+              </button>
+              <button class="flex items-center px-2 py-1.5 rounded-lg hover:bg-gray-100 transition-colors text-sm">
+                <svg class="h-6 w-6 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Sentimiento
+              </button>
+              <button class="flex items-center px-2 py-1.5 rounded-lg hover:bg-gray-100 transition-colors text-sm">
+                <svg class="h-6 w-6 mr-2 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                Ubicación
+              </button>
+            </div>
+          </div>
+
+          <!-- Stories -->
+          <div class="bg-white rounded-lg shadow-sm p-4 mb-4">
+            <div class="flex space-x-2 overflow-x-auto pb-2">
+              <div class="flex-shrink-0 w-28 h-48 rounded-lg border border-gray-200 relative overflow-hidden cursor-pointer group">
+                <div class="absolute inset-0 bg-gradient-to-b from-gray-200 to-gray-400"></div>
+                <div class="absolute bottom-0 left-0 right-0 p-2 bg-white rounded-t-lg text-center">
+                  <div class="h-8 w-8 rounded-full bg-blue-600 mx-auto flex items-center justify-center mb-1">
+                    <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                  </div>
+                  <p class="text-xs font-medium">Crear historia</p>
+                </div>
+              </div>
+              
+              
+              
+            
+              
+              
+            </div>
+          </div>
+
+          <!-- Posts Feed -->
+          <div id="postsContainer" class="space-y-4">
+            <!-- Los posts se cargarán dinámicamente aquí -->
+            <div id="loadingPosts" class="text-center py-8 bg-white rounded-lg shadow-sm">
+              <div class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-600"></div>
+              <p class="mt-2 text-gray-600">Cargando publicaciones...</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Barra lateral derecha -->
+        <div class="hidden lg:block w-1/4 pl-4">
+          <div class="bg-white rounded-lg shadow-sm p-4 mb-4">
+            <h3 class="font-medium text-gray-800 mb-3">Contactos</h3>
+            <ul class="space-y-2">
+            
+            </ul>
+          </div>
+          
+          <div class="bg-white rounded-lg shadow-sm p-4">
+            <h3 class="font-medium text-gray-800 mb-3">Sugerencias para ti</h3>
+            <ul class="space-y-3">
+            
+            </ul>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Modal para crear post estilo Facebook -->
+    <div id="postModal" class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 hidden">
+      <div class="bg-white rounded-lg w-full max-w-lg mx-4 shadow-xl">
+        <div class="flex justify-between items-center p-4 border-b">
+          <h3 class="text-xl font-semibold text-gray-800">Crear publicación</h3>
+          <button id="closePostModal" class="text-gray-500 hover:text-gray-700">
+            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <div class="p-4">
+          <div class="flex items-center space-x-3 mb-4">
+            <div class="h-10 w-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600"></div>
+            <div>
+              <p class="font-medium text-gray-800">Tu Nombre</p>
+              <div class="flex items-center text-xs bg-gray-100 rounded px-2 py-1 mt-1">
+                <svg class="h-3 w-3 mr-1 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064" />
+                </svg>
+                <span>Público</span>
+                <svg class="h-3 w-3 ml-1 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
+          </div>
+          <textarea id="postContent" class="w-full p-3 min-h-[120px] text-gray-800 text-lg focus:outline-none" placeholder="¿Qué estás pensando?"></textarea>
+          <div id="mediaPreview" class="mb-4 hidden">
+            <div class="relative">
+              <img id="previewImage" src="" alt="Vista previa" class="max-h-60 rounded-lg mx-auto">
+              <button id="removeMediaBtn" class="absolute top-2 right-2 bg-gray-800 text-white rounded-full p-1 hover:bg-gray-700 transition-colors">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="bg-gray-100 rounded-lg p-3 flex items-center justify-between mb-4">
+            <span class="text-gray-800 font-medium">Añadir a tu publicación</span>
+            <div class="flex space-x-2">
+              <button id="addMediaBtn" class="text-gray-500 hover:bg-gray-200 p-2 rounded-full transition-colors">
+                <svg class="h-6 w-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </button>
+              <button class="text-gray-500 hover:bg-gray-200 p-2 rounded-full transition-colors">
+                <svg class="h-6 w-6 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </button>
+              <button class="text-gray-500 hover:bg-gray-200 p-2 rounded-full transition-colors">
+                <svg class="h-6 w-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+          <button id="submitPostBtn" class="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
+            Publicar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para comentarios -->
+    <div id="commentModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+      <div class="bg-white rounded-2xl p-6 w-full max-w-lg mx-4 shadow-xl">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-xl font-semibold text-gray-800">Comentarios</h3>
+          <button id="closeCommentModal" class="text-gray-500 hover:text-gray-700">
+            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <div id="commentsList" class="max-h-80 overflow-y-auto mb-4">
+          <!-- Los comentarios se cargarán dinámicamente aquí -->
+        </div>
+        <div class="flex">
+          <input type="text" id="commentInput" class="flex-1 p-3 border border-gray-200 rounded-l-xl focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Escribe un comentario...">
+          <button id="submitCommentBtn" class="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-r-xl hover:opacity-90 transition-colors">
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  /* Mejoras de accesibilidad */
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+</style>
+
+<script>
+  // @ts-ignore
+  import { auth, posts, utils } from '../utils/api.js';
+
+  // Verificar si el usuario está autenticado
+  if (!utils.isAuthenticated()) {
+    window.location.href = '/';
+  }
+
+  // Elementos del DOM
+  const logoutBtn = document.getElementById('logoutBtn') as HTMLButtonElement;
+  const postsContainer = document.getElementById('postsContainer') as HTMLDivElement;
+  const loadingPosts = document.getElementById('loadingPosts') as HTMLDivElement;
+  const postModal = document.getElementById('postModal') as HTMLDivElement;
+  const openPostModal = document.getElementById('openPostModal') as HTMLButtonElement;
+  const closePostModal = document.getElementById('closePostModal') as HTMLButtonElement;
+  const postContent = document.getElementById('postContent') as HTMLTextAreaElement;
+  const submitPostBtn = document.getElementById('submitPostBtn') as HTMLButtonElement;
+  const addMediaBtn = document.getElementById('addMediaBtn') as HTMLButtonElement;
+  const removeMediaBtn = document.getElementById('removeMediaBtn') as HTMLButtonElement;
+  const mediaPreview = document.getElementById('mediaPreview') as HTMLDivElement;
+  const previewImage = document.getElementById('previewImage') as HTMLImageElement;
+  const commentModal = document.getElementById('commentModal') as HTMLDivElement;
+  const closeCommentModal = document.getElementById('closeCommentModal') as HTMLButtonElement;
+  const commentsList = document.getElementById('commentsList') as HTMLDivElement;
+  const commentInput = document.getElementById('commentInput') as HTMLInputElement;
+  const submitCommentBtn = document.getElementById('submitCommentBtn') as HTMLButtonElement;
+
+  // Variable para almacenar el ID del post actual para comentarios
+  let currentPostId: string | null = null;
+  let selectedMedia: string | null = null;
+
+  // Cerrar sesión
+  logoutBtn?.addEventListener('click', () => {
+    auth.logout();
+    window.location.href = '/';
+  });
+
+  // Abrir modal de creación de post
+  openPostModal?.addEventListener('click', () => {
+    if (postModal) {
+      postModal.classList.remove('hidden');
+    }
+  });
+
+  // Cerrar modal de creación de post
+  closePostModal?.addEventListener('click', () => {
+    if (postModal) {
+      postModal.classList.add('hidden');
+      if (postContent) postContent.value = '';
+      if (mediaPreview) mediaPreview.classList.add('hidden');
+      selectedMedia = null;
+    }
+  });
+
+  // Cargar posts
+  const loadPosts = async () => {
+    try {
+      const allPosts = await posts.getAll();
+      
+      // Ocultar indicador de carga
+      if (loadingPosts) {
+        loadingPosts.classList.add('hidden');
+      }
+      
+      // Limpiar contenedor de posts
+      if (postsContainer) {
+        postsContainer.innerHTML = '';
+      }
+      
+      // Si no hay posts, mostrar mensaje
+      if (allPosts.length === 0) {
+        if (postsContainer) {
+          postsContainer.innerHTML = `
+            <div class="bg-white rounded-lg shadow-sm p-4 text-center">
+              <p class="text-gray-600">No hay publicaciones todavía. ¡Sé el primero en publicar!</p>
+            </div>
+          `;
+        }
+        return;
+      }
+      
+      // Renderizar posts
+      allPosts.forEach((post: any) => {
+        const postElement = createPostElement(post);
+        if (postsContainer && postElement) {
+          postsContainer.appendChild(postElement);
+        }
+      });
+    } catch (error) {
+      console.error('Error al cargar posts:', error);
+      if (loadingPosts) {
+        loadingPosts.innerHTML = `
+          <div class="text-center py-8">
+            <p class="text-red-600">Error al cargar las publicaciones. Por favor, intenta de nuevo.</p>
+          </div>
+        `;
+      }
+    }
+  };
+
+  // Crear elemento de post
+  const createPostElement = (post: any) => {
+    const postElement = document.createElement('article');
+    postElement.className = 'bg-white rounded-lg shadow-sm mb-4';
+    postElement.dataset.postId = post._id;
+    
+    // Verificar si el usuario actual dio like
+    const currentUserId = utils.getCurrentUserId();
+    const userHasLiked = post.likes && post.likes.some((like: any) => 
+      like.user === currentUserId || (like.user && like.user._id === currentUserId)
+    );
+    
+    // Formatear fecha
+    const postDate = new Date(post.createdAt);
+    const formattedDate = formatDate(postDate);
+    
+    // Crear HTML del post estilo Facebook
+    postElement.innerHTML = `
+      <div class="p-4">
+        <div class="flex items-center mb-3">
+          <div class="h-10 w-10 rounded-full bg-gray-300 mr-3"></div>
+          <div>
+            <div class="flex items-center">
+              <h3 class="font-semibold text-gray-800">${post.user.name}</h3>
+              <span class="mx-1 text-gray-400">•</span>
+              <span class="text-gray-500 text-sm">${formattedDate}</span>
+            </div>
+            <div class="flex items-center text-xs text-gray-500">
+              <svg class="h-3 w-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064" />
+              </svg>
+              <span>Público</span>
+            </div>
+          </div>
+          <div class="ml-auto">
+            <button class="text-gray-500 hover:bg-gray-100 p-2 rounded-full transition-colors">
+              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" />
+              </svg>
+            </button>
+          </div>
+        </div>
+        <p class="mb-4 text-gray-800">${post.content}</p>
+        ${post.image ? `
+          <div class="mb-3 -mx-4">
+            <img src="${post.image}" alt="Imagen del post" class="w-full">
+          </div>
+        ` : ''}
+        
+        <!-- Contador de reacciones y comentarios -->
+        <div class="flex items-center justify-between text-sm text-gray-500 py-2 border-t border-b border-gray-100">
+          <div class="flex items-center">
+            <div class="flex -space-x-1 mr-2">
+              <div class="h-5 w-5 rounded-full bg-blue-500 flex items-center justify-center">
+                <svg class="h-3 w-3 text-white" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M14 9h3l-4-5-4 5h3v5h2z"></path>
+                </svg>
+              </div>
+            </div>
+            <span class="like-count">${post.likes ? post.likes.length : 0}</span>
+          </div>
+          <div>
+            <span>${post.comments ? post.comments.length : 0} comentarios</span>
+          </div>
+        </div>
+        
+        <!-- Botones de acción -->
+        <div class="flex mt-1">
+          <button class="like-btn flex-1 flex items-center justify-center p-2 hover:bg-gray-100 rounded-md transition-colors ${userHasLiked ? 'text-blue-600 font-medium' : 'text-gray-600'}" data-post-id="${post._id}" data-liked="${userHasLiked}">
+            <svg class="h-6 w-6 mr-2 ${userHasLiked ? 'text-blue-600' : ''}" fill="${userHasLiked ? 'currentColor' : 'none'}" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
+            </svg>
+            ${userHasLiked ? 'Me gusta' : 'Me gusta'}
+          </button>
+          <button class="comment-btn flex-1 flex items-center justify-center p-2 hover:bg-gray-100 rounded-md transition-colors text-gray-600" data-post-id="${post._id}">
+            <svg class="h-6 w-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            </svg>
+            Comentar
+          </button>
+          <button class="flex-1 flex items-center justify-center p-2 hover:bg-gray-100 rounded-md transition-colors text-gray-600">
+            <svg class="h-6 w-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+            </svg>
+            Compartir
+          </button>
+        </div>
+        
+        <!-- Sección de comentarios -->
+        ${post.comments && post.comments.length > 0 ? `
+          <div class="mt-3 pt-3 border-t border-gray-100">
+            <!-- Campo de comentario -->
+            <div class="flex items-center mb-3">
+              <div class="h-8 w-8 rounded-full bg-gray-300 mr-2 flex-shrink-0"></div>
+              <div class="flex-1 relative">
+                <input type="text" placeholder="Escribe un comentario..." class="w-full bg-gray-100 rounded-full py-1.5 px-3 text-sm focus:outline-none" data-post-id="${post._id}">
+              </div>
+            </div>
+            
+            <!-- Comentarios más recientes (limitado a 2) -->
+            <div class="space-y-2">
+              ${post.comments.slice(0, 2).map((comment: any) => {
+                const commentDate = new Date(comment.createdAt);
+                const formattedCommentDate = formatDate(commentDate);
+                
+                return `
+                  <div class="flex items-start">
+                    <div class="h-8 w-8 rounded-full bg-gray-300 mr-2 flex-shrink-0"></div>
+                    <div>
+                      <div class="bg-gray-100 rounded-xl px-3 py-2">
+                        <h4 class="font-medium text-gray-800 text-sm">${comment.user.name}</h4>
+                        <p class="text-gray-800 text-sm">${comment.content}</p>
+                      </div>
+                      <div class="flex items-center mt-1 text-xs text-gray-500 ml-2">
+                        <button class="font-medium hover:underline">Me gusta</button>
+                        <span class="mx-1">•</span>
+                        <button class="font-medium hover:underline">Responder</button>
+                        <span class="mx-1">•</span>
+                        <span>${formattedCommentDate}</span>
+                      </div>
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+              
+              ${post.comments.length > 2 ? `
+                <button class="text-sm text-gray-500 hover:text-gray-700 font-medium comment-btn" data-post-id="${post._id}">
+                  Ver los ${post.comments.length - 2} comentarios más
+                </button>
+              ` : ''}
+            </div>
+          </div>
+        ` : `
+          <!-- Campo de comentario cuando no hay comentarios -->
+          <div class="mt-3 pt-3 border-t border-gray-100">
+            <div class="flex items-center">
+              <div class="h-8 w-8 rounded-full bg-gray-300 mr-2 flex-shrink-0"></div>
+              <div class="flex-1 relative">
+                <input type="text" placeholder="Escribe un comentario..." class="w-full bg-gray-100 rounded-full py-1.5 px-3 text-sm focus:outline-none" data-post-id="${post._id}">
+              </div>
+            </div>
+          </div>
+        `}
+      </div>
+    `;
+    
+    // Añadir event listeners para los botones
+    const likeBtn = postElement.querySelector('.like-btn') as HTMLButtonElement;
+    const commentBtn = postElement.querySelector('.comment-btn') as HTMLButtonElement;
+    
+    likeBtn?.addEventListener('click', () => handleLike(post._id, likeBtn));
+    commentBtn?.addEventListener('click', () => openCommentModal(post._id));
+    
+    // Añadir event listener para el botón "Ver más comentarios"
+    const viewAllCommentsBtn = postElement.querySelector('button.comment-btn[data-post-id]') as HTMLButtonElement;
+    if (viewAllCommentsBtn && viewAllCommentsBtn !== commentBtn) {
+      viewAllCommentsBtn.addEventListener('click', () => openCommentModal(post._id));
+    }
+    
+    // Añadir event listener para el campo de comentario
+    const commentField = postElement.querySelector('input[data-post-id]') as HTMLInputElement;
+    if (commentField) {
+      commentField.addEventListener('keydown', async (e) => {
+        if (e.key === 'Enter' && commentField.value.trim()) {
+          const content = commentField.value.trim();
+          commentField.value = '';
+          try {
+            await posts.comment(post._id, content);
+            // Recargar posts
+            loadPosts();
+          } catch (error) {
+            console.error('Error al comentar:', error);
+          }
+        }
+      });
+    }
+    
+    return postElement;
+  };
+
+  // Formatear fecha
+  const formatDate = (date: Date) => {
+    const now = new Date();
+    const diff = now.getTime() - date.getTime();
+    const seconds = Math.floor(diff / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+    
+    if (days > 0) {
+      return `Hace ${days} día${days > 1 ? 's' : ''}`;
+    } else if (hours > 0) {
+      return `Hace ${hours} hora${hours > 1 ? 's' : ''}`;
+    } else if (minutes > 0) {
+      return `Hace ${minutes} minuto${minutes > 1 ? 's' : ''}`;
+    } else {
+      return 'Ahora mismo';
+    }
+  };
+
+  // Manejar like
+  const handleLike = async (postId: string, btnElement?: HTMLButtonElement) => {
+    try {
+      // Realizar la acción de like en el servidor
+      await posts.like(postId);
+      
+      // Actualizar la UI sin recargar todos los posts
+      if (btnElement) {
+        const isLiked = btnElement.getAttribute('data-liked') === 'true';
+        const likeCountEl = btnElement.closest('.p-4')?.querySelector('.like-count');
+        const likeCount = likeCountEl ? parseInt(likeCountEl.textContent || '0') : 0;
+        
+        if (isLiked) {
+          // Quitar estilo de like
+          btnElement.classList.remove('text-blue-600', 'font-medium');
+          btnElement.classList.add('text-gray-600');
+          btnElement.setAttribute('data-liked', 'false');
+          
+          // Actualizar el icono
+          const svgIcon = btnElement.querySelector('svg');
+          if (svgIcon) {
+            svgIcon.classList.remove('text-blue-600');
+            svgIcon.setAttribute('fill', 'none');
+          }
+          
+          // Actualizar contador
+          if (likeCountEl && likeCount > 0) {
+            likeCountEl.textContent = (likeCount - 1).toString();
+          }
+        } else {
+          // Añadir estilo de like
+          btnElement.classList.remove('text-gray-600');
+          btnElement.classList.add('text-blue-600', 'font-medium');
+          btnElement.setAttribute('data-liked', 'true');
+          
+          // Actualizar el icono
+          const svgIcon = btnElement.querySelector('svg');
+          if (svgIcon) {
+            svgIcon.classList.add('text-blue-600');
+            svgIcon.setAttribute('fill', 'currentColor');
+          }
+          
+          // Actualizar contador
+          if (likeCountEl) {
+            likeCountEl.textContent = (likeCount + 1).toString();
+          }
+        }
+      } else {
+        // Si no tenemos el elemento del botón, recargamos todos los posts
+        loadPosts();
+      }
+    } catch (error) {
+      console.error('Error al dar like:', error);
+    }
+  };
+
+  // Abrir modal de comentarios
+  const openCommentModal = async (postId: string) => {
+    currentPostId = postId;
+    if (commentModal) {
+      commentModal.classList.remove('hidden');
+    }
+    
+    // Mostrar indicador de carga
+    if (commentsList) {
+      commentsList.innerHTML = '<p class="text-center text-gray-500">Cargando comentarios...</p>';
+    }
+    
+    try {
+      // Obtener el post específico para ver sus comentarios
+      const post = await posts.getById(postId);
+      
+      if (commentsList) {
+        if (!post.comments || post.comments.length === 0) {
+          commentsList.innerHTML = '<p class="text-center text-gray-500">No hay comentarios todavía. ¡Sé el primero en comentar!</p>';
+        } else {
+          // Mostrar los comentarios
+          commentsList.innerHTML = post.comments.map((comment: any) => {
+            const commentDate = new Date(comment.createdAt);
+            const formattedDate = formatDate(commentDate);
+            
+            return `
+              <div class="mb-4 pb-4 border-b border-gray-100">
+                <div class="flex items-start space-x-3">
+                  <div class="h-8 w-8 rounded-full bg-gradient-to-br from-purple-400 to-indigo-400 flex-shrink-0"></div>
+                  <div class="flex-1">
+                    <div class="flex items-center">
+                      <h4 class="font-medium text-gray-800">${comment.user.name}</h4>
+                      <span class="ml-2 text-xs text-gray-500">${formattedDate}</span>
+                    </div>
+                    <p class="text-gray-700 mt-1">${comment.content}</p>
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+      }
+    } catch (error) {
+      console.error('Error al cargar comentarios:', error);
+      if (commentsList) {
+        commentsList.innerHTML = '<p class="text-center text-red-500">Error al cargar los comentarios. Por favor, intenta de nuevo.</p>';
+      }
+    }
+  };
+
+  // Cerrar modal de comentarios
+  closeCommentModal?.addEventListener('click', () => {
+    if (commentModal) {
+      commentModal.classList.add('hidden');
+      currentPostId = null;
+    }
+  });
+
+  // Manejar envío de comentario
+  submitCommentBtn?.addEventListener('click', async () => {
+    if (!currentPostId || !commentInput) return;
+    
+    const content = commentInput.value.trim();
+    if (!content) return;
+    
+    try {
+      await posts.comment(currentPostId, content);
+      commentInput.value = '';
+      // Recargar posts para actualizar los comentarios
+      loadPosts();
+    } catch (error) {
+      console.error('Error al comentar:', error);
+    }
+  });
+
+  // Manejar envío de post
+  submitPostBtn?.addEventListener('click', async () => {
+    if (!postContent) return;
+    
+    const content = postContent.value.trim();
+    if (!content && !selectedMedia) return;
+    
+    try {
+      // Mostrar indicador de carga
+      submitPostBtn.textContent = 'Publicando...';
+      submitPostBtn.disabled = true;
+      
+      // Crear post
+      const postData = {
+        content,
+        image: selectedMedia || null
+      };
+      
+      await posts.create(postData);
+      
+      // Cerrar modal y recargar posts
+      if (postModal) {
+        postModal.classList.add('hidden');
+      }
+      postContent.value = '';
+      if (mediaPreview) mediaPreview.classList.add('hidden');
+      selectedMedia = null;
+      
+      // Recargar posts
+      loadPosts();
+    } catch (error) {
+      console.error('Error al crear post:', error);
+      submitPostBtn.textContent = 'Publicar';
+      submitPostBtn.disabled = false;
+    }
+  });
+
+  // Manejar selección de media
+  addMediaBtn?.addEventListener('click', () => {
+    // Crear input de tipo file
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'image/*,video/*';
+    
+    fileInput.addEventListener('change', (e: Event) => {
+      const target = e.target as HTMLInputElement;
+      const file = target.files?.[0];
+      if (!file) return;
+      
+      // Verificar el tamaño del archivo (máximo 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('La imagen es demasiado grande. El tamaño máximo permitido es 5MB.');
+        return;
+      }
+      
+      // Verificar el tipo de archivo
+      if (!file.type.startsWith('image/')) {
+        alert('Solo se permiten archivos de imagen.');
+        return;
+      }
+      
+      // Mostrar vista previa
+      const reader = new FileReader();
+      reader.onload = (event: ProgressEvent<FileReader>) => {
+        const result = event.target?.result as string;
+        if (previewImage && mediaPreview) {
+          previewImage.src = result;
+          mediaPreview.classList.remove('hidden');
+        }
+        selectedMedia = result;
+      };
+      reader.readAsDataURL(file);
+    });
+    
+    fileInput.click();
+  });
+
+  // Manejar eliminación de media
+  removeMediaBtn?.addEventListener('click', () => {
+    if (mediaPreview) {
+      mediaPreview.classList.add('hidden');
+    }
+    if (previewImage) {
+      previewImage.src = '';
+    }
+    selectedMedia = null;
+  });
+
+  // Cargar posts al iniciar
+  loadPosts();
+
+  // Configurar navegación con transición
+  document.addEventListener('DOMContentLoaded', () => {
+    // Obtener todos los enlaces de navegación
+    const navLinks = document.querySelectorAll('a[href^="/"]');
+    
+    // Configurar los botones de logout para que muestren la transición
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        
+        // Mostrar transición antes de cerrar sesión
+        // @ts-ignore - Accedemos a la función global
+        if (window.navigateTo) {
+          // @ts-ignore
+          window.showTransition?.();
+          
+          setTimeout(() => {
+            auth.logout();
+            window.location.href = '/';
+          }, 600);
+        } else {
+          auth.logout();
+          window.location.href = '/';
+        }
+      });
+    }
+  });
+</script> 
