@@ -6,34 +6,46 @@ import LoadingTransition from '../components/LoadingTransition.astro';
 <Layout title="TellMe - Feed">
   <!-- Añadir meta tag para asegurar UTF-8 -->
   <meta charset="UTF-8" slot="head"/>
-  <div class="min-h-screen bg-gray-100">
-    <!-- Navbar estilo Facebook -->
-    <nav class="bg-white shadow-md fixed w-full top-0 z-50 border-b border-gray-200">
+  <div class="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-50">
+    <!-- Navbar estilo modernizado -->
+    <nav class="bg-white/80 backdrop-blur-sm shadow-lg fixed w-full top-0 z-50 border-b border-purple-100">
       <div class="max-w-7xl mx-auto px-4">
-        <div class="flex justify-between items-center h-14">
+        <div class="flex justify-between items-center h-16">
           <div class="flex items-center">
-            <h1 class="text-2xl font-bold text-blue-600">TellMe</h1>
-            <div class="ml-4 relative">
+            <h1 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-600">TellMe</h1>
+            <div class="ml-6 relative">
               <input 
                 type="text" 
                 placeholder="Buscar en TellMe" 
-                class="bg-gray-100 rounded-full py-1.5 pl-9 pr-3 text-sm w-60 focus:outline-none"
+                class="bg-purple-50 rounded-full py-2 pl-10 pr-4 text-sm w-64 focus:outline-none focus:ring-2 focus:ring-purple-300 transition-all"
               >
-              <svg class="h-4 w-4 text-gray-500 absolute left-3 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="h-4 w-4 text-purple-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </div>
           </div>
           
-          <div class="flex items-center space-x-1">
-            <a href="/profile" class="p-2 rounded-full hover:bg-gray-200 transition-colors">
+          <div class="flex items-center space-x-3">
+            <a href="/profile" class="p-2 rounded-full hover:bg-purple-100 transition-colors relative">
               <span class="sr-only">Perfil</span>
-              <svg class="h-6 w-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
+              <div class="relative h-8 w-8 rounded-full overflow-hidden">
+                <img src="/images/avatar-placeholder.png" alt="Foto de perfil" class="h-full w-full object-cover user-profile-image">
+                <div class="h-full w-full flex items-center justify-center bg-gradient-to-br from-purple-400 to-indigo-500 text-white font-bold user-initials text-xs">
+                  TM
+                </div>
+              </div>
+              <span class="absolute top-0 right-0 h-2 w-2 bg-green-400 rounded-full"></span>
             </a>
-            <button id="logoutBtn" class="p-2 rounded-full hover:bg-gray-200 transition-colors">
-              <svg class="h-6 w-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <!-- Botón de notificaciones con indicador de solicitudes -->
+            <a href="#" id="notifications-btn" class="p-2 rounded-full hover:bg-purple-100 transition-colors relative">
+              <svg class="h-6 w-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+              </svg>
+              <!-- Indicador de solicitudes pendientes -->
+              <span id="request-indicator" class="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center font-semibold hidden">0</span>
+            </a>
+            <button id="logoutBtn" class="p-2 rounded-full hover:bg-purple-100 transition-colors">
+              <svg class="h-6 w-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
               </svg>
             </button>
@@ -43,126 +55,120 @@ import LoadingTransition from '../components/LoadingTransition.astro';
     </nav>
 
     <!-- Main Content con 3 columnas -->
-    <main class="pt-16 pb-8">
+    <main class="pt-20 pb-8">
       <div class="max-w-7xl mx-auto px-4 flex">
         <!-- Barra lateral izquierda -->
         <div class="hidden lg:block w-1/4 pr-4">
-          <div class="bg-white rounded-lg shadow-sm p-4 mb-4">
-            <ul class="space-y-1">
+          <div class="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-5 mb-4 border border-purple-100">
+            <ul class="space-y-2">
               <li>
-                <a href="/profile" class="flex items-center p-2 rounded-lg hover:bg-gray-100 transition-colors">
-                  <div class="h-9 w-9 rounded-full bg-blue-600 flex-shrink-0 mr-3"></div>
-                  <span class="text-gray-800">Mi Perfil</span>
+                <a href="/profile" class="flex items-center p-3 rounded-lg hover:bg-purple-50 transition-colors">
+                  <div class="relative h-10 w-10 rounded-full overflow-hidden flex-shrink-0 mr-3 shadow-md">
+                    <img src="/images/avatar-placeholder.png" alt="Foto de perfil" class="h-full w-full object-cover user-profile-image">
+                    <div class="h-full w-full flex items-center justify-center bg-gradient-to-br from-purple-400 to-indigo-500 text-white font-bold user-initials">
+                      TM
+                    </div>
+                  </div>
+                  <span class="text-purple-900 font-medium">Mi Perfil</span>
                 </a>
               </li>
               <li>
-                <a href="#" class="flex items-center p-2 rounded-lg hover:bg-gray-100 transition-colors">
-                  <svg class="h-9 w-9 text-blue-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <a href="#" class="flex items-center p-3 rounded-lg hover:bg-purple-50 transition-colors">
+                  <svg class="h-10 w-10 text-purple-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                   </svg>
-                  <span class="text-gray-800">Amigos</span>
+                  <span class="text-purple-900 font-medium">Amigos</span>
                 </a>
-              </li>
-              <li>
-                <a href="#" class="flex items-center p-2 rounded-lg hover:bg-gray-100 transition-colors">
-                  <svg class="h-9 w-9 text-blue-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <span class="text-gray-800">Recientes</span>
-                </a>
-              </li>
-              <li>
-                <a href="#" class="flex items-center p-2 rounded-lg hover:bg-gray-100 transition-colors">
-                  <svg class="h-9 w-9 text-blue-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                  </svg>
-                  <span class="text-gray-800">Guardados</span>
-                </a>
-              </li>
+              </li>            
             </ul>
           </div>
         </div>
         
         <!-- Contenido central -->
         <div class="w-full lg:w-2/4 px-0 lg:px-4">
-          <!-- Create Post -->
-          <div class="bg-white rounded-lg shadow-sm p-4 mb-4">
-            <div class="flex items-center space-x-4 mb-4">
-              <div class="h-10 w-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600"></div>
-              <button class="w-full px-4 py-2.5 border border-gray-300 rounded-full bg-gray-100 text-left text-gray-500 hover:bg-gray-200 transition-colors text-sm" id="openPostModal">
-                ¿Que estas pensando?
-              </button>
-            </div>
-            <div class="flex justify-between items-center border-t border-gray-200 pt-3">
-              <button class="flex items-center px-2 py-1.5 rounded-lg hover:bg-gray-100 transition-colors text-sm" id="uploadMediaBtn">
-                <svg class="h-6 w-6 mr-2 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                Foto/Video
-              </button>
-              <button class="flex items-center px-2 py-1.5 rounded-lg hover:bg-gray-100 transition-colors text-sm">
-                <svg class="h-6 w-6 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <!-- Create Post -->
+          <div class="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-5 mb-6 border border-purple-100">
+          <div class="flex items-center space-x-4 mb-4">
+              <div class="relative h-12 w-12 rounded-full overflow-hidden shadow-md">
+                <img src="/images/avatar-placeholder.png" alt="Foto de perfil" class="h-full w-full object-cover user-profile-image">
+                <div class="h-full w-full flex items-center justify-center bg-gradient-to-br from-purple-400 to-indigo-500 text-white font-bold user-initials">
+                  TM
+                </div>
+              </div>
+              <button class="w-full px-4 py-3 border border-purple-200 rounded-full bg-purple-50 text-left text-gray-500 hover:bg-purple-100 transition-colors text-sm" id="openPostModal">
+                Que hay de nuevo?
+            </button>
+          </div>
+          <div class="flex justify-between items-center border-t border-purple-100 pt-4">
+              <button class="flex items-center px-3 py-2 rounded-lg hover:bg-purple-50 transition-colors text-sm" id="uploadMediaBtn">
+                <svg class="h-6 w-6 mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              Foto/Video
+            </button>
+              <button class="flex items-center px-3 py-2 rounded-lg hover:bg-purple-50 transition-colors text-sm">
+                <svg class="h-6 w-6 mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 Sentimiento
-              </button>
-              <button class="flex items-center px-2 py-1.5 rounded-lg hover:bg-gray-100 transition-colors text-sm">
-                <svg class="h-6 w-6 mr-2 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-                Ubicación
-              </button>
-            </div>
-          </div>
-
-          <!-- Stories -->
-          <div class="bg-white rounded-lg shadow-sm p-4 mb-4">
-            <div class="flex space-x-2 overflow-x-auto pb-2">
-              <div class="flex-shrink-0 w-28 h-48 rounded-lg border border-gray-200 relative overflow-hidden cursor-pointer group">
-                <div class="absolute inset-0 bg-gradient-to-b from-gray-200 to-gray-400"></div>
-                <div class="absolute bottom-0 left-0 right-0 p-2 bg-white rounded-t-lg text-center">
-                  <div class="h-8 w-8 rounded-full bg-blue-600 mx-auto flex items-center justify-center mb-1">
-                    <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
-                  </div>
-                  <p class="text-xs font-medium">Crear historia</p>
-                </div>
-              </div>
-              
-              
-              
-            
-              
-              
-            </div>
-          </div>
-
-          <!-- Posts Feed -->
-          <div id="postsContainer" class="space-y-4">
-            <!-- Los posts se cargarán dinámicamente aquí -->
-            <div id="loadingPosts" class="text-center py-8 bg-white rounded-lg shadow-sm">
-              <div class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-600"></div>
-              <p class="mt-2 text-gray-600">Cargando publicaciones...</p>
-            </div>
+            </button>
           </div>
         </div>
+
+        <!-- Posts Feed -->
+        <div id="postsContainer" class="space-y-6">
+          <!-- Los posts se cargarán dinámicamente aquí -->
+            <div id="loadingPosts" class="text-center py-8 bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-purple-100">
+            <div class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-purple-600"></div>
+              <p class="mt-2 text-purple-600">Cargando publicaciones...</p>
+          </div>
+        </div>
+      </div>
         
         <!-- Barra lateral derecha -->
         <div class="hidden lg:block w-1/4 pl-4">
-          <div class="bg-white rounded-lg shadow-sm p-4 mb-4">
-            <h3 class="font-medium text-gray-800 mb-3">Contactos</h3>
-            <ul class="space-y-2">
+          <div class="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-5 mb-4 border border-purple-100">
+        <div class="flex justify-between items-center mb-4">
+              <h3 class="font-semibold text-purple-900">Contactos</h3>
+              <button id="toggleFriendMode" class="text-xs text-purple-600 hover:text-purple-800">
+                Ver todas las publicaciones
+              </button>
+            </div>
             
-            </ul>
-          </div>
-          
-          <div class="bg-white rounded-lg shadow-sm p-4">
-            <h3 class="font-medium text-gray-800 mb-3">Sugerencias para ti</h3>
-            <ul class="space-y-3">
+            <!-- Buscador de usuarios -->
+            <div class="mb-4 relative">
+              <div class="relative">
+                <input 
+                  type="text" 
+                  id="searchUsers"
+                  placeholder="Buscar usuarios..." 
+                  class="w-full bg-purple-50 rounded-lg py-2 pl-8 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300 transition-all"
+                >
+                <svg class="h-4 w-4 text-purple-400 absolute left-2 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+              
+              <!-- Resultados de búsqueda (inicialmente ocultos) -->
+              <div id="searchResults" class="absolute z-10 mt-1 w-full bg-white rounded-lg shadow-lg border border-gray-200 max-h-60 overflow-y-auto hidden">
+                <!-- Los resultados se cargarán dinámicamente aquí -->
+              </div>
+            </div>
             
+            <!-- Solicitudes de amistad (Movidas arriba para mayor visibilidad) -->
+            <div id="friendRequestsContainer" class="mb-6">
+              <!-- Las solicitudes se cargarán dinámicamente aquí -->
+            </div>
+            
+            <!-- Lista de amigos -->
+            <ul class="space-y-4">
+              <!-- Los amigos se cargarán dinámicamente aquí -->
+              <li class="text-center text-gray-500 py-2">
+                Cargando contactos...
+              </li>
             </ul>
+            
+            <!-- Antiguo contenedor de solicitudes, ahora eliminado -->
           </div>
         </div>
       </div>
@@ -170,9 +176,9 @@ import LoadingTransition from '../components/LoadingTransition.astro';
 
     <!-- Modal para crear post estilo Facebook -->
     <div id="postModal" class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 hidden">
-      <div class="bg-white rounded-lg w-full max-w-lg mx-4 shadow-xl">
-        <div class="flex justify-between items-center p-4 border-b">
-          <h3 class="text-xl font-semibold text-gray-800">Crear publicación</h3>
+      <div class="bg-white rounded-xl w-full max-w-lg mx-4 shadow-xl">
+        <div class="flex justify-between items-center p-4 border-b border-purple-100">
+          <h3 class="text-xl font-semibold text-purple-900">Crear publicacion</h3>
           <button id="closePostModal" class="text-gray-500 hover:text-gray-700">
             <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -181,39 +187,43 @@ import LoadingTransition from '../components/LoadingTransition.astro';
         </div>
         <div class="p-4">
           <div class="flex items-center space-x-3 mb-4">
-            <div class="h-10 w-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600"></div>
+            <div class="relative h-10 w-10 rounded-full overflow-hidden">
+              <img src="/images/avatar-placeholder.png" alt="Foto de perfil" class="h-full w-full object-cover user-profile-image">
+              <div class="h-full w-full flex items-center justify-center bg-gradient-to-br from-purple-400 to-indigo-500 text-white font-bold user-initials text-sm">
+                TM
+              </div>
+            </div>
             <div>
-              <p class="font-medium text-gray-800">Tu Nombre</p>
-              <div class="flex items-center text-xs bg-gray-100 rounded px-2 py-1 mt-1">
-                <svg class="h-3 w-3 mr-1 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <p class="font-medium text-purple-900" id="modalUserName">Tu Nombre</p>
+              <div class="flex items-center text-xs bg-purple-50 rounded px-2 py-1 mt-1">
+                <svg class="h-3 w-3 mr-1 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064" />
                 </svg>
-                <span>Público</span>
-                <svg class="h-3 w-3 ml-1 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <span>Publico</span>
+                <svg class="h-3 w-3 ml-1 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                 </svg>
               </div>
             </div>
           </div>
-          <textarea id="postContent" class="w-full p-3 min-h-[120px] text-gray-800 text-lg focus:outline-none" placeholder="¿Qué estás pensando?"></textarea>
-          <div id="mediaPreview" class="mb-4 hidden">
-            <div class="relative">
+          <textarea id="postContent" class="w-full p-3 min-h-[120px] text-gray-800 text-lg focus:outline-none" placeholder="Que hay por aqui?"></textarea>
+        <div id="mediaPreview" class="mb-4 hidden">
+          <div class="relative">
               <img id="previewImage" src="" alt="Vista previa" class="max-h-60 rounded-lg mx-auto">
               <button id="removeMediaBtn" class="absolute top-2 right-2 bg-gray-800 text-white rounded-full p-1 hover:bg-gray-700 transition-colors">
-                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
+              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
           </div>
+        </div>
           <div class="bg-gray-100 rounded-lg p-3 flex items-center justify-between mb-4">
-            <span class="text-gray-800 font-medium">Añadir a tu publicación</span>
             <div class="flex space-x-2">
               <button id="addMediaBtn" class="text-gray-500 hover:bg-gray-200 p-2 rounded-full transition-colors">
                 <svg class="h-6 w-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-              </button>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </button>
               <button class="text-gray-500 hover:bg-gray-200 p-2 rounded-full transition-colors">
                 <svg class="h-6 w-6 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -275,7 +285,7 @@ import LoadingTransition from '../components/LoadingTransition.astro';
 
 <script>
   // @ts-ignore
-  import { auth, posts, utils } from '../utils/api.js';
+  import { auth, posts, utils, friends } from '../utils/api.js';
 
   // Verificar si el usuario está autenticado
   if (!utils.isAuthenticated()) {
@@ -300,10 +310,108 @@ import LoadingTransition from '../components/LoadingTransition.astro';
   const commentsList = document.getElementById('commentsList') as HTMLDivElement;
   const commentInput = document.getElementById('commentInput') as HTMLInputElement;
   const submitCommentBtn = document.getElementById('submitCommentBtn') as HTMLButtonElement;
+  const userProfileImages = document.querySelectorAll('.user-profile-image') as NodeListOf<HTMLImageElement>;
+  const userInitials = document.querySelectorAll('.user-initials') as NodeListOf<HTMLDivElement>;
+  
+  // Elementos para amigos
+  const friendsContainer = document.querySelector('ul.space-y-4') as HTMLUListElement;
+  const searchUsersInput = document.getElementById('searchUsers') as HTMLInputElement;
+  const searchResults = document.getElementById('searchResults') as HTMLDivElement;
+  const friendRequestsContainer = document.getElementById('friendRequestsContainer') as HTMLDivElement;
+  const toggleFriendMode = document.getElementById('toggleFriendMode') as HTMLButtonElement;
 
   // Variable para almacenar el ID del post actual para comentarios
   let currentPostId: string | null = null;
   let selectedMedia: string | null = null;
+  let showFriendsPostsOnly = true; // Por defecto, solo mostrar publicaciones de amigos
+
+  // Agregar constante DEBUG_MODE para depuración
+  const DEBUG_MODE = window.location.hostname === 'localhost' || window.location.hostname.includes('127.0.0.1');
+
+  // Cargar foto de perfil del usuario actual
+  const loadUserProfileImage = async () => {
+    try {
+      const currentUser = await auth.getCurrentUser();
+      
+      // Obtener URL base de la API
+      const getBaseUrl = () => {
+        const isProduction = window.location.hostname !== 'localhost' && !window.location.hostname.includes('127.0.0.1');
+        return isProduction ? 'https://api.tellme-app.com' : 'http://localhost:5000';
+      };
+      
+      const baseUrl = getBaseUrl();
+      
+      // Actualizar todas las imágenes de perfil del usuario
+      if (currentUser) {
+        let profileImageUrl = currentUser.profilePicture || '';
+        
+        // Asegurarse de que la URL de la imagen es completa
+        if (profileImageUrl && profileImageUrl.startsWith('/uploads/')) {
+          profileImageUrl = `${baseUrl}${profileImageUrl}`;
+        }
+        
+        // Si hay una foto de perfil, mostrarla
+        if (profileImageUrl) {
+          // Actualizar todas las imágenes de perfil
+          userProfileImages.forEach(img => {
+            img.src = profileImageUrl;
+            img.classList.remove('hidden');
+          });
+          
+          // Ocultar los iniciales
+          userInitials.forEach(div => {
+            div.classList.add('hidden');
+          });
+        } else {
+          // Si no hay foto, mostrar las iniciales
+          userProfileImages.forEach(img => {
+            img.classList.add('hidden');
+          });
+          
+          // Construir iniciales a partir del nombre (como máximo 2 caracteres)
+          const name = currentUser.name || 'Usuario';
+          const words = name.split(' ');
+          let initials = '';
+          
+          if (words.length >= 2) {
+            // Primera letra del primer nombre + primera letra del segundo nombre/apellido
+            initials = words[0].charAt(0) + words[1].charAt(0);
+          } else if (words.length === 1) {
+            // Primera y segunda letra del único nombre (o solo la primera si el nombre tiene un solo carácter)
+            initials = words[0].charAt(0) + (words[0].length > 1 ? words[0].charAt(1) : '');
+          } else {
+            // Fallback si no hay nombre
+            initials = 'U';
+          }
+          
+          userInitials.forEach(div => {
+            div.textContent = initials.toUpperCase();
+            div.classList.remove('hidden');
+          });
+        }
+        
+        // Actualizar el nombre en el modal
+        const userNameElement = document.getElementById('modalUserName');
+        if (userNameElement) {
+          userNameElement.textContent = currentUser.name || 'Usuario';
+        }
+      }
+    } catch (error) {
+      console.error('Error al cargar imagen de perfil:', error);
+      // Mostrar iniciales como fallback en caso de error
+      userProfileImages.forEach(img => {
+        img.classList.add('hidden');
+      });
+      
+      userInitials.forEach(div => {
+        div.textContent = 'TM';
+        div.classList.remove('hidden');
+      });
+    }
+  };
+  
+  // Cargar foto de perfil al iniciar
+  loadUserProfileImage();
 
   // Cerrar sesión
   logoutBtn?.addEventListener('click', () => {
@@ -331,7 +439,15 @@ import LoadingTransition from '../components/LoadingTransition.astro';
   // Cargar posts
   const loadPosts = async () => {
     try {
-      const allPosts = await posts.getAll();
+      let allPosts;
+      try {
+        // Intentar cargar posts de amigos primero
+        allPosts = await posts.getAll(showFriendsPostsOnly);
+      } catch (error) {
+        console.warn('Error al cargar posts filtrados por amigos, cargando todos los posts:', error);
+        // Si falla, cargar todos los posts (endpoint normal que ya existe)
+        allPosts = await posts.getAll(false);
+      }
       
       // Ocultar indicador de carga
       if (loadingPosts) {
@@ -348,7 +464,9 @@ import LoadingTransition from '../components/LoadingTransition.astro';
         if (postsContainer) {
           postsContainer.innerHTML = `
             <div class="bg-white rounded-lg shadow-sm p-4 text-center">
-              <p class="text-gray-600">No hay publicaciones todavía. ¡Sé el primero en publicar!</p>
+              <p class="text-gray-600">${showFriendsPostsOnly ? 
+                'No hay publicaciones de tus amigos. ¡Añade amigos para ver sus publicaciones!' : 
+                'No hay publicaciones todavía. ¡Sé el primero en publicar!'}</p>
             </div>
           `;
         }
@@ -377,7 +495,7 @@ import LoadingTransition from '../components/LoadingTransition.astro';
   // Crear elemento de post
   const createPostElement = (post: any) => {
     const postElement = document.createElement('article');
-    postElement.className = 'bg-white rounded-lg shadow-sm mb-4';
+    postElement.className = 'bg-white backdrop-blur-sm border border-purple-100 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 mb-6 overflow-hidden';
     postElement.dataset.postId = post._id;
     
     // Verificar si el usuario actual dio like
@@ -390,129 +508,168 @@ import LoadingTransition from '../components/LoadingTransition.astro';
     const postDate = new Date(post.createdAt);
     const formattedDate = formatDate(postDate);
     
-    // Crear HTML del post estilo Facebook
+    // Obtener URL base de la API
+    const getBaseUrl = () => {
+      const isProduction = window.location.hostname !== 'localhost' && !window.location.hostname.includes('127.0.0.1');
+      return isProduction ? 'https://api.tellme-app.com' : 'http://localhost:5000';
+    };
+    
+    const baseUrl = getBaseUrl();
+    
+    // Asegurarnos de que la URL de la imagen de perfil sea completa
+    let profileImageUrl = post.user.profilePicture || '/images/avatar-placeholder.png';
+    if (profileImageUrl && profileImageUrl.startsWith('/uploads/')) {
+      profileImageUrl = `${baseUrl}${profileImageUrl}`;
+    }
+    
+    // Crear HTML del post con estilo único
     postElement.innerHTML = `
-      <div class="p-4">
-        <div class="flex items-center mb-3">
-          <div class="h-10 w-10 rounded-full bg-gray-300 mr-3"></div>
-          <div>
+      <div class="p-5">
+        <div class="flex items-center mb-4">
+          <div class="relative">
+            <img src="${profileImageUrl}" alt="${post.user.name}" class="h-12 w-12 rounded-full object-cover mr-3 border-2 border-purple-300 p-0.5 shadow-md">
+            <div class="absolute -bottom-1 -right-1 h-5 w-5 bg-green-400 rounded-full border-2 border-white"></div>
+        </div>
+          <div class="flex-1">
             <div class="flex items-center">
-              <h3 class="font-semibold text-gray-800">${post.user.name}</h3>
+              <h3 class="font-bold text-purple-900">${post.user.name}</h3>
               <span class="mx-1 text-gray-400">•</span>
               <span class="text-gray-500 text-sm">${formattedDate}</span>
-            </div>
+      </div>
             <div class="flex items-center text-xs text-gray-500">
-              <svg class="h-3 w-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="h-3 w-3 mr-1 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064" />
               </svg>
-              <span>Público</span>
+              <span class="font-medium text-purple-500">Público</span>
             </div>
           </div>
           <div class="ml-auto">
-            <button class="text-gray-500 hover:bg-gray-100 p-2 rounded-full transition-colors">
-              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <button class="text-gray-500 hover:bg-purple-100 p-2 rounded-full transition-colors">
+              <svg class="h-5 w-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" />
               </svg>
             </button>
           </div>
         </div>
-        <p class="mb-4 text-gray-800">${post.content}</p>
-        ${post.image ? `
-          <div class="mb-3 -mx-4">
-            <img src="${post.image}" alt="Imagen del post" class="w-full">
-          </div>
-        ` : ''}
+        <p class="mb-5 text-gray-700 leading-relaxed">${post.content}</p>
+      ${post.image ? `
+          <div class="mb-4 -mx-5 relative">
+            <img src="${post.image.startsWith('/uploads/') ? `${baseUrl}${post.image}` : post.image}" alt="Imagen del post" class="w-full h-auto object-cover rounded-md shadow-inner">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-md pointer-events-none"></div>
+        </div>
+      ` : ''}
         
         <!-- Contador de reacciones y comentarios -->
-        <div class="flex items-center justify-between text-sm text-gray-500 py-2 border-t border-b border-gray-100">
+        <div class="flex items-center justify-between text-sm text-gray-500 py-3 border-t border-b border-purple-100 my-2">
           <div class="flex items-center">
-            <div class="flex -space-x-1 mr-2">
-              <div class="h-5 w-5 rounded-full bg-blue-500 flex items-center justify-center">
-                <svg class="h-3 w-3 text-white" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M14 9h3l-4-5-4 5h3v5h2z"></path>
-                </svg>
-              </div>
+            <div class="flex -space-x-2 mr-2">
+              <img src="${post.likes && post.likes.length > 0 && post.likes[0].user && post.likes[0].user.profilePicture ? 
+                (post.likes[0].user.profilePicture.startsWith('/uploads/') ? 
+                  `http://localhost:5000${post.likes[0].user.profilePicture}` : post.likes[0].user.profilePicture) 
+                : '/images/avatar-placeholder.png'}" 
+                alt="Usuario que dio like" 
+                class="h-6 w-6 rounded-full object-cover border-2 border-white shadow-sm">
             </div>
-            <span class="like-count">${post.likes ? post.likes.length : 0}</span>
+            <span class="like-count font-medium text-purple-600">${post.likes ? post.likes.length : 0} me gusta</span>
           </div>
           <div>
-            <span>${post.comments ? post.comments.length : 0} comentarios</span>
+            <span class="font-medium text-purple-600">${post.comments ? post.comments.length : 0} comentarios</span>
           </div>
         </div>
         
         <!-- Botones de acción -->
-        <div class="flex mt-1">
-          <button class="like-btn flex-1 flex items-center justify-center p-2 hover:bg-gray-100 rounded-md transition-colors ${userHasLiked ? 'text-blue-600 font-medium' : 'text-gray-600'}" data-post-id="${post._id}" data-liked="${userHasLiked}">
-            <svg class="h-6 w-6 mr-2 ${userHasLiked ? 'text-blue-600' : ''}" fill="${userHasLiked ? 'currentColor' : 'none'}" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
-            </svg>
+        <div class="flex mt-2 space-x-2">
+          <button class="like-btn flex-1 flex items-center justify-center py-2 px-4 rounded-lg transition-all duration-200 ${userHasLiked ? 'bg-purple-100 text-purple-600 font-semibold' : 'hover:bg-purple-50 text-gray-600'}" data-post-id="${post._id}" data-liked="${userHasLiked}">
+            <svg class="h-5 w-5 mr-2 ${userHasLiked ? 'text-purple-600' : ''}" fill="${userHasLiked ? 'currentColor' : 'none'}" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
+          </svg>
             ${userHasLiked ? 'Me gusta' : 'Me gusta'}
-          </button>
-          <button class="comment-btn flex-1 flex items-center justify-center p-2 hover:bg-gray-100 rounded-md transition-colors text-gray-600" data-post-id="${post._id}">
-            <svg class="h-6 w-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-            </svg>
+        </button>
+          <button class="comment-btn flex-1 flex items-center justify-center py-2 px-4 rounded-lg hover:bg-purple-50 transition-all duration-200 text-gray-600" data-post-id="${post._id}">
+            <svg class="h-5 w-5 mr-2 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+          </svg>
             Comentar
           </button>
-          <button class="flex-1 flex items-center justify-center p-2 hover:bg-gray-100 rounded-md transition-colors text-gray-600">
-            <svg class="h-6 w-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <button class="flex-1 flex items-center justify-center py-2 px-4 rounded-lg hover:bg-purple-50 transition-all duration-200 text-gray-600">
+            <svg class="h-5 w-5 mr-2 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
             </svg>
             Compartir
-          </button>
-        </div>
-        
+        </button>
+      </div>
+      
         <!-- Sección de comentarios -->
-        ${post.comments && post.comments.length > 0 ? `
-          <div class="mt-3 pt-3 border-t border-gray-100">
+      ${post.comments && post.comments.length > 0 ? `
+          <div class="mt-4 pt-3 border-t border-purple-100">
             <!-- Campo de comentario -->
             <div class="flex items-center mb-3">
-              <div class="h-8 w-8 rounded-full bg-gray-300 mr-2 flex-shrink-0"></div>
+              <div class="relative">
+                <img src="/images/avatar-placeholder.png" id="currentUserAvatar-${post._id}" class="h-10 w-10 rounded-full object-cover mr-3 border-2 border-purple-100 p-0.5">
+              </div>
               <div class="flex-1 relative">
-                <input type="text" placeholder="Escribe un comentario..." class="w-full bg-gray-100 rounded-full py-1.5 px-3 text-sm focus:outline-none" data-post-id="${post._id}">
+                <input type="text" placeholder="Escribe un comentario..." class="w-full bg-purple-50 rounded-full py-2 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300 transition-all" data-post-id="${post._id}">
+                <button class="absolute right-2 top-1/2 transform -translate-y-1/2 text-purple-500 hover:text-purple-700">
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  </svg>
+                </button>
               </div>
             </div>
             
             <!-- Comentarios más recientes (limitado a 2) -->
-            <div class="space-y-2">
-              ${post.comments.slice(0, 2).map((comment: any) => {
-                const commentDate = new Date(comment.createdAt);
-                const formattedCommentDate = formatDate(commentDate);
+          <div class="space-y-3">
+            ${post.comments.slice(0, 2).map((comment: any) => {
+              const commentDate = new Date(comment.createdAt);
+              const formattedCommentDate = formatDate(commentDate);
                 
-                return `
-                  <div class="flex items-start">
-                    <div class="h-8 w-8 rounded-full bg-gray-300 mr-2 flex-shrink-0"></div>
-                    <div>
-                      <div class="bg-gray-100 rounded-xl px-3 py-2">
-                        <h4 class="font-medium text-gray-800 text-sm">${comment.user.name}</h4>
-                        <p class="text-gray-800 text-sm">${comment.content}</p>
-                      </div>
+                // Asegurarnos de que la URL de la imagen de perfil del comentarista sea completa
+                let commentUserProfilePic = comment.user.profilePicture || '/images/avatar-placeholder.png';
+                if (commentUserProfilePic && commentUserProfilePic.startsWith('/uploads/')) {
+                  commentUserProfilePic = `http://localhost:5000${commentUserProfilePic}`;
+                }
+              
+              return `
+                  <div class="flex items-start group">
+                    <img src="${commentUserProfilePic}" alt="${comment.user.name}" class="h-9 w-9 rounded-full object-cover mr-2 flex-shrink-0 border border-purple-100">
+                  <div class="flex-1">
+                      <div class="bg-purple-50 rounded-2xl px-4 py-2 group-hover:bg-purple-100 transition-colors">
+                        <h4 class="font-semibold text-purple-900 text-sm">${comment.user.name}</h4>
+                        <p class="text-gray-700 text-sm">${comment.content}</p>
+                    </div>
                       <div class="flex items-center mt-1 text-xs text-gray-500 ml-2">
-                        <button class="font-medium hover:underline">Me gusta</button>
+                        <button class="font-medium text-purple-600 hover:text-purple-800 hover:underline">Me gusta</button>
                         <span class="mx-1">•</span>
-                        <button class="font-medium hover:underline">Responder</button>
+                        <button class="font-medium text-purple-600 hover:text-purple-800 hover:underline">Responder</button>
                         <span class="mx-1">•</span>
                         <span>${formattedCommentDate}</span>
                       </div>
-                    </div>
                   </div>
-                `;
-              }).join('')}
+                </div>
+              `;
+            }).join('')}
               
-              ${post.comments.length > 2 ? `
-                <button class="text-sm text-gray-500 hover:text-gray-700 font-medium comment-btn" data-post-id="${post._id}">
+            ${post.comments.length > 2 ? `
+                <button class="text-sm text-purple-600 hover:text-purple-800 font-medium comment-btn mt-2 transition-colors" data-post-id="${post._id}">
                   Ver los ${post.comments.length - 2} comentarios más
-                </button>
-              ` : ''}
-            </div>
+              </button>
+            ` : ''}
           </div>
+        </div>
         ` : `
           <!-- Campo de comentario cuando no hay comentarios -->
-          <div class="mt-3 pt-3 border-t border-gray-100">
+          <div class="mt-4 pt-3 border-t border-purple-100">
             <div class="flex items-center">
-              <div class="h-8 w-8 rounded-full bg-gray-300 mr-2 flex-shrink-0"></div>
+              <div class="relative">
+                <img src="/images/avatar-placeholder.png" id="currentUserAvatar-${post._id}" class="h-10 w-10 rounded-full object-cover mr-3 border-2 border-purple-100 p-0.5">
+              </div>
               <div class="flex-1 relative">
-                <input type="text" placeholder="Escribe un comentario..." class="w-full bg-gray-100 rounded-full py-1.5 px-3 text-sm focus:outline-none" data-post-id="${post._id}">
+                <input type="text" placeholder="Escribe un comentario..." class="w-full bg-purple-50 rounded-full py-2 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300 transition-all" data-post-id="${post._id}">
+                <button class="absolute right-2 top-1/2 transform -translate-y-1/2 text-purple-500 hover:text-purple-700">
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  </svg>
+                </button>
               </div>
             </div>
           </div>
@@ -524,8 +681,13 @@ import LoadingTransition from '../components/LoadingTransition.astro';
     const likeBtn = postElement.querySelector('.like-btn') as HTMLButtonElement;
     const commentBtn = postElement.querySelector('.comment-btn') as HTMLButtonElement;
     
-    likeBtn?.addEventListener('click', () => handleLike(post._id, likeBtn));
-    commentBtn?.addEventListener('click', () => openCommentModal(post._id));
+    if (likeBtn) {
+      likeBtn.addEventListener('click', () => handleLike(post._id, likeBtn));
+    }
+    
+    if (commentBtn) {
+      commentBtn.addEventListener('click', () => openCommentModal(post._id));
+    }
     
     // Añadir event listener para el botón "Ver más comentarios"
     const viewAllCommentsBtn = postElement.querySelector('button.comment-btn[data-post-id]') as HTMLButtonElement;
@@ -550,6 +712,28 @@ import LoadingTransition from '../components/LoadingTransition.astro';
         }
       });
     }
+    
+    // Cargar imagen de perfil del usuario actual en el campo de comentario
+    const loadCurrentUserAvatar = async () => {
+      try {
+        const currentUser = await auth.getCurrentUser();
+        if (currentUser && currentUser.profilePicture) {
+          const avatarImg = postElement.querySelector(`#currentUserAvatar-${post._id}`) as HTMLImageElement;
+          if (avatarImg) {
+            let profileImageUrl = currentUser.profilePicture;
+            if (profileImageUrl.startsWith('/uploads/')) {
+              profileImageUrl = `http://localhost:5000${profileImageUrl}`;
+            }
+            avatarImg.src = profileImageUrl;
+          }
+        }
+      } catch (error) {
+        console.error('Error al cargar avatar del usuario actual:', error);
+      }
+    };
+    
+    // Ejecutar la carga del avatar
+    loadCurrentUserAvatar();
     
     return postElement;
   };
@@ -623,7 +807,7 @@ import LoadingTransition from '../components/LoadingTransition.astro';
         }
       } else {
         // Si no tenemos el elemento del botón, recargamos todos los posts
-        loadPosts();
+      loadPosts();
       }
     } catch (error) {
       console.error('Error al dar like:', error);
@@ -655,11 +839,17 @@ import LoadingTransition from '../components/LoadingTransition.astro';
             const commentDate = new Date(comment.createdAt);
             const formattedDate = formatDate(commentDate);
             
+            // Asegurarnos de que la URL de la imagen de perfil del comentarista sea completa
+            let commentUserProfilePic = comment.user.profilePicture || '/images/avatar-placeholder.png';
+            if (commentUserProfilePic && commentUserProfilePic.startsWith('/uploads/')) {
+              commentUserProfilePic = `http://localhost:5000${commentUserProfilePic}`;
+            }
+            
             return `
               <div class="mb-4 pb-4 border-b border-gray-100">
                 <div class="flex items-start space-x-3">
-                  <div class="h-8 w-8 rounded-full bg-gradient-to-br from-purple-400 to-indigo-400 flex-shrink-0"></div>
-                  <div class="flex-1">
+                  <img src="${commentUserProfilePic}" alt="${comment.user.name}" class="h-8 w-8 rounded-full object-cover flex-shrink-0">
+                  <div>
                     <div class="flex items-center">
                       <h4 class="font-medium text-gray-800">${comment.user.name}</h4>
                       <span class="ml-2 text-xs text-gray-500">${formattedDate}</span>
@@ -712,6 +902,9 @@ import LoadingTransition from '../components/LoadingTransition.astro';
     const content = postContent.value.trim();
     if (!content && !selectedMedia) return;
     
+    // Guardar el estado original del botón
+    const originalButtonText = submitPostBtn.textContent || 'Publicar';
+    
     try {
       // Mostrar indicador de carga
       submitPostBtn.textContent = 'Publicando...';
@@ -723,7 +916,16 @@ import LoadingTransition from '../components/LoadingTransition.astro';
         image: selectedMedia || null
       };
       
-      await posts.create(postData);
+      // Añadir timeout de seguridad para evitar bloqueos indefinidos
+      const createPostPromise = posts.create(postData);
+      
+      // Si la petición tarda más de 10 segundos, mostramos una alerta
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('La publicación está tardando demasiado tiempo. Verifica tu conexión a internet.')), 10000);
+      });
+      
+      // Esperar a que se complete la publicación o se agote el tiempo
+      await Promise.race([createPostPromise, timeoutPromise]);
       
       // Cerrar modal y recargar posts
       if (postModal) {
@@ -737,7 +939,15 @@ import LoadingTransition from '../components/LoadingTransition.astro';
       loadPosts();
     } catch (error) {
       console.error('Error al crear post:', error);
-      submitPostBtn.textContent = 'Publicar';
+      // Extraer mensaje de error de forma segura
+      let errorMessage = 'Error en el servidor';
+      if (error && typeof error === 'object' && 'message' in error && typeof error.message === 'string') {
+        errorMessage = error.message;
+      }
+      alert(`Error al crear la publicación: ${errorMessage}`);
+    } finally {
+      // Restaurar el estado del botón sin importar el resultado
+      submitPostBtn.textContent = originalButtonText;
       submitPostBtn.disabled = false;
     }
   });
@@ -747,7 +957,7 @@ import LoadingTransition from '../components/LoadingTransition.astro';
     // Crear input de tipo file
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
-    fileInput.accept = 'image/*,video/*';
+    fileInput.accept = 'image/*';
     
     fileInput.addEventListener('change', (e: Event) => {
       const target = e.target as HTMLInputElement;
@@ -756,8 +966,7 @@ import LoadingTransition from '../components/LoadingTransition.astro';
       
       // Verificar el tamaño del archivo (máximo 5MB)
       if (file.size > 5 * 1024 * 1024) {
-        alert('La imagen es demasiado grande. El tamaño máximo permitido es 5MB.');
-        return;
+        alert('La imagen es demasiado grande. El tamaño máximo permitido es 5MB. Se redimensionará automáticamente.');
       }
       
       // Verificar el tipo de archivo
@@ -766,16 +975,59 @@ import LoadingTransition from '../components/LoadingTransition.astro';
         return;
       }
       
-      // Mostrar vista previa
+      // Redimensionar y comprimir imagen antes de convertir a Base64
+      const img = new Image();
       const reader = new FileReader();
-      reader.onload = (event: ProgressEvent<FileReader>) => {
-        const result = event.target?.result as string;
+      
+      reader.onload = (e) => {
+        img.src = e.target?.result as string;
+        
+        img.onload = () => {
+          // Crear un canvas para redimensionar la imagen
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          
+          // Calcular el nuevo tamaño (máximo 1200px en cualquier dimensión)
+          let width = img.width;
+          let height = img.height;
+          const maxDimension = 1200;
+          
+          if (width > height && width > maxDimension) {
+            height = Math.round(height * (maxDimension / width));
+            width = maxDimension;
+          } else if (height > maxDimension) {
+            width = Math.round(width * (maxDimension / height));
+            height = maxDimension;
+          }
+          
+          // Establecer dimensiones del canvas
+          canvas.width = width;
+          canvas.height = height;
+          
+          // Dibujar la imagen redimensionada
+          ctx?.drawImage(img, 0, 0, width, height);
+          
+          // Obtener la imagen como data URL con calidad reducida (0.7 = 70%)
+          try {
+            const dataUrl = canvas.toDataURL(file.type, 0.7);
+            
+            // Mostrar vista previa
         if (previewImage && mediaPreview) {
-          previewImage.src = result;
+              previewImage.src = dataUrl;
           mediaPreview.classList.remove('hidden');
         }
-        selectedMedia = result;
+            
+            // Guardar la imagen procesada
+            selectedMedia = dataUrl;
+            
+            console.log('Imagen procesada correctamente. Tamaño Base64:', dataUrl.length);
+          } catch (error) {
+            console.error('Error al procesar la imagen:', error);
+            alert('Error al procesar la imagen. Intenta con una imagen diferente.');
+          }
+        };
       };
+      
       reader.readAsDataURL(file);
     });
     
@@ -793,8 +1045,706 @@ import LoadingTransition from '../components/LoadingTransition.astro';
     selectedMedia = null;
   });
 
-  // Cargar posts al iniciar
+  // Cargar amigos
+  const loadFriends = async () => {
+    if (!friendsContainer) return;
+    
+    try {
+      // Obtener usuarios registrados (ya sea amigos o todos los usuarios)
+      const userFriends = await friends.getFriends();
+      
+      if (DEBUG_MODE) {
+        console.log('Usuarios obtenidos:', userFriends);
+      }
+      
+      // Limpiar contenedor
+      friendsContainer.innerHTML = '';
+      
+      if (!userFriends || userFriends.length === 0) {
+        friendsContainer.innerHTML = `
+          <li class="text-center text-gray-500 text-sm py-2">
+            No hay usuarios disponibles. Intenta más tarde.
+          </li>
+        `;
+        return;
+      }
+      
+      // Obtener el ID del usuario actual para no mostrarlo en la lista
+      const currentUserId = utils.getCurrentUserId();
+      
+      // Renderizar lista de usuarios filtrados (excluyendo al usuario actual)
+      const filteredUsers = userFriends.filter((user: any) => user._id !== currentUserId);
+      
+      if (filteredUsers.length === 0) {
+        friendsContainer.innerHTML = `
+          <li class="text-center text-gray-500 text-sm py-2">
+            No hay otros usuarios registrados.
+          </li>
+        `;
+        return;
+      }
+      
+      filteredUsers.forEach((user: any) => {
+        const friendItem = document.createElement('li');
+        friendItem.className = 'flex items-center space-x-3 py-2';
+        
+        // Asegurarnos de que la URL de la imagen de perfil sea completa
+        let profileImageUrl = user.profilePicture || '/images/avatar-placeholder.png';
+        if (profileImageUrl && profileImageUrl.startsWith('/uploads/')) {
+          profileImageUrl = `http://localhost:5000${profileImageUrl}`;
+        }
+        
+        // Determinar si está en línea (por defecto no)
+        const isOnline = user.online === true;
+        
+        // Determinar si ya es un amigo (para frontend, asumimos que no por ahora)
+        const isAlreadyFriend = user.isFriend === true;
+        
+        friendItem.innerHTML = `
+          <img src="${profileImageUrl}" alt="${user.name}" class="h-10 w-10 rounded-full object-cover border-2 border-purple-100">
+          <div class="flex-1">
+            <p class="text-sm font-medium text-purple-900">${user.name}</p>
+            <p class="text-xs text-gray-500">${user.bio || 'Usuario de TellMe'}</p>
+          </div>
+          <button class="add-friend-btn text-purple-500 hover:text-purple-700" data-user-id="${user._id}">
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+          </button>
+        `;
+        
+        // Añadir event listener para añadir amigo
+        const addBtn = friendItem.querySelector('.add-friend-btn') as HTMLButtonElement;
+        if (addBtn) {
+          addBtn.addEventListener('click', async () => {
+            const userId = addBtn.getAttribute('data-user-id');
+            if (!userId) return;
+            
+            try {
+              // Deshabilitar el botón mientras se procesa
+              addBtn.disabled = true;
+              addBtn.innerHTML = `
+                <div class="inline-block animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-purple-600"></div>
+              `;
+              
+              const result = await friends.sendFriendRequest(userId);
+              
+              // Verificar si tenemos un resultado con isError (formato nuevo)
+              if (result && typeof result === 'object' && 'isError' in result) {
+                if (result.success === false) {
+                  // Es un error controlado, mostrar mensaje adecuado
+                  console.log('Mensaje del servidor:', result.message);
+                  
+                  // Si ya existe solicitud o son amigos, mostrar un estado diferente
+                  if (result.message && (
+                      result.message.includes('Ya existe una solicitud') || 
+                      result.message.includes('Ya son amigos'))
+                  ) {
+                    addBtn.outerHTML = `
+                      <span class="text-gray-600 text-xs px-2 py-1 bg-gray-50 rounded-md">
+                        ${result.message.includes('Ya existe una solicitud') ? 'Pendiente' : 'Amigos'}
+                      </span>
+                    `;
+                    return;
+                  }
+                  
+                  alert(result.message || 'No se pudo enviar la solicitud. Inténtalo de nuevo.');
+                  
+                  // Restaurar el botón y mostrar error
+                  addBtn.disabled = false;
+                  addBtn.innerHTML = `
+                    <svg class="h-5 w-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                  `;
+                  
+                  setTimeout(() => {
+                    addBtn.innerHTML = `
+                      <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                      </svg>
+                    `;
+                    addBtn.classList.remove('text-red-500');
+                    addBtn.classList.add('text-purple-500');
+                  }, 2000);
+                  return;
+                }
+              }
+              
+              // Caso de éxito (ya sea con objeto nuevo o con respuesta estándar)
+              addBtn.outerHTML = `
+                <span class="text-green-600 text-xs px-2 py-1 bg-green-50 rounded-md">
+                  <svg class="h-4 w-4 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  Enviada
+                </span>
+              `;
+            } catch (error) {
+              console.error('Error inesperado al enviar solicitud de amistad:', error);
+              
+              // Restaurar el botón y mostrar error
+              addBtn.disabled = false;
+              addBtn.innerHTML = `
+                <svg class="h-5 w-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+              `;
+              
+              alert('No se pudo enviar la solicitud. Inténtalo de nuevo.');
+            }
+          });
+        }
+        
+        friendsContainer.appendChild(friendItem);
+      });
+    } catch (error) {
+      console.error('Error al cargar usuarios:', error);
+      friendsContainer.innerHTML = `
+        <li class="text-center text-red-500 text-sm py-2">
+          Error al cargar usuarios. Intenta de nuevo más tarde.
+        </li>
+      `;
+    }
+  };
+
+  // Cargar solicitudes de amistad
+  const loadFriendRequests = async () => {
+    if (!friendRequestsContainer) return;
+    
+    try {
+      // Obtener solicitudes de amistad
+      const requests = await friends.getFriendRequests();
+      
+      // Limpiar contenedor
+      friendRequestsContainer.innerHTML = '';
+      
+      // Actualizar indicador de solicitudes en el navbar si existe
+      const requestIndicator = document.getElementById('request-indicator');
+      if (requestIndicator) {
+        if (requests && requests.length > 0) {
+          requestIndicator.textContent = requests.length.toString();
+          requestIndicator.classList.remove('hidden');
+        } else {
+          requestIndicator.classList.add('hidden');
+        }
+      }
+      
+      if (!requests || requests.length === 0) {
+        // No mostrar nada si no hay solicitudes
+        friendRequestsContainer.classList.remove('mb-6');
+        friendRequestsContainer.classList.add('hidden');
+        return;
+      }
+      
+      // Mostrar sección de solicitudes con un diseño más prominente y con animación
+      friendRequestsContainer.classList.remove('hidden');
+      friendRequestsContainer.classList.add('mb-6', 'animate-pulse');
+      // Quitar la animación después de 2 segundos
+      setTimeout(() => {
+        friendRequestsContainer.classList.remove('animate-pulse');
+      }, 2000);
+      
+      friendRequestsContainer.innerHTML = `
+        <div class="bg-gradient-to-r from-purple-100 to-pink-100 rounded-xl shadow-sm border border-purple-200 overflow-hidden">
+          <div class="bg-gradient-to-r from-purple-500 to-indigo-500 py-3 px-4">
+            <h4 class="font-semibold text-white flex items-center">
+              <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+              Solicitudes de amistad (${requests.length})
+            </h4>
+          </div>
+          <div class="p-4" id="requestsList"></div>
+        </div>
+      `;
+      
+      const requestsList = document.getElementById('requestsList') as HTMLDivElement;
+      
+      // Renderizar solicitudes con un nuevo diseño más atractivo
+      requests.forEach((request: any) => {
+        const requestItem = document.createElement('div');
+        requestItem.className = 'bg-white rounded-lg p-4 mb-3 flex flex-col shadow-sm border border-purple-100';
+        requestItem.dataset.requestId = request._id;
+        
+        // Asegurarnos de que la URL de la imagen de perfil sea completa
+        let profileImageUrl = request.sender.profilePicture || '/images/avatar-placeholder.png';
+        if (profileImageUrl && profileImageUrl.startsWith('/uploads/')) {
+          profileImageUrl = `http://localhost:5000${profileImageUrl}`;
+        }
+        
+        // Formatear la fecha de la solicitud
+        const formatDate = (dateString: string) => {
+          const date = new Date(dateString);
+          // Si es hoy, mostrar "Hoy a las HH:MM"
+          const today = new Date();
+          if (date.toDateString() === today.toDateString()) {
+            return `Hoy a las ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+          }
+          // Si es ayer, mostrar "Ayer a las HH:MM"
+          const yesterday = new Date();
+          yesterday.setDate(yesterday.getDate() - 1);
+          if (date.toDateString() === yesterday.toDateString()) {
+            return `Ayer a las ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+          }
+          // En otro caso, mostrar la fecha completa
+          return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+        };
+        
+        const createdAtFormatted = formatDate(request.createdAt);
+        
+        requestItem.innerHTML = `
+          <div class="flex items-center mb-3">
+            <img src="${profileImageUrl}" alt="${request.sender.name}" class="h-14 w-14 rounded-full object-cover mr-3 border-2 border-purple-200">
+            <div class="flex-1">
+              <p class="font-semibold text-purple-900">${request.sender.name}</p>
+              <p class="text-xs text-gray-500 mt-1">Solicitud recibida: ${createdAtFormatted}</p>
+            </div>
+          </div>
+          <div class="flex justify-between gap-2" id="request-buttons-${request._id}">
+            <button class="accept-request w-1/2 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg text-sm hover:opacity-90 transition-colors flex items-center justify-center" data-request-id="${request._id}">
+              <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+              Aceptar
+            </button>
+            <button class="reject-request w-1/2 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm hover:bg-gray-300 transition-colors flex items-center justify-center" data-request-id="${request._id}">
+              <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              Rechazar
+            </button>
+          </div>
+        `;
+        
+        requestsList.appendChild(requestItem);
+        
+        // Añadir event listeners a los botones
+        const acceptBtn = requestItem.querySelector('.accept-request') as HTMLButtonElement;
+        const rejectBtn = requestItem.querySelector('.reject-request') as HTMLButtonElement;
+        const buttonsContainer = requestItem.querySelector(`#request-buttons-${request._id}`) as HTMLDivElement;
+        
+        if (acceptBtn) {
+          acceptBtn.addEventListener('click', async () => {
+            const requestId = acceptBtn.dataset.requestId;
+            if (!requestId) return;
+            
+            // Mostrar indicador de carga
+            buttonsContainer.innerHTML = `
+              <div class="text-center w-full py-2">
+                <div class="inline-block animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-purple-600"></div>
+                <span class="ml-2 text-purple-600 text-sm">Procesando...</span>
+              </div>
+            `;
+            
+            try {
+              await friends.acceptFriendRequest(requestId);
+              
+              // Mostrar mensaje de éxito
+              buttonsContainer.innerHTML = `
+                <div class="w-full py-2 bg-green-100 text-green-700 rounded-lg text-center">
+                  <svg class="h-5 w-5 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  ¡Ahora son amigos!
+                </div>
+              `;
+              
+              // Después de mostrar brevemente el mensaje, eliminar la solicitud de la vista
+              setTimeout(() => {
+                requestItem.classList.add('opacity-0', 'transform', 'scale-95', 'transition-all', 'duration-500');
+                setTimeout(() => {
+                  requestItem.remove();
+                  
+                  // Si no hay más solicitudes, ocultar el contenedor
+                  if (requestsList.children.length === 0) {
+                    friendRequestsContainer.classList.add('hidden');
+                    friendRequestsContainer.classList.remove('mb-6');
+                  }
+                }, 500);
+              }, 1500);
+              
+              // Recargar amigos y posts
+              loadFriends();
+              loadPosts();
+            } catch (error) {
+              console.error('Error al aceptar solicitud:', error);
+              
+              // Restaurar botones en caso de error
+              buttonsContainer.innerHTML = `
+                <button class="accept-request w-1/2 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg text-sm hover:opacity-90 transition-colors flex items-center justify-center" data-request-id="${requestId}">
+                  <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  Aceptar
+                </button>
+                <button class="reject-request w-1/2 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm hover:bg-gray-300 transition-colors flex items-center justify-center" data-request-id="${requestId}">
+                  <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  Rechazar
+                </button>
+              `;
+              
+              // Añadir nuevamente los event listeners
+              const newAcceptBtn = requestItem.querySelector('.accept-request') as HTMLButtonElement;
+              const newRejectBtn = requestItem.querySelector('.reject-request') as HTMLButtonElement;
+              
+              if (newAcceptBtn) {
+                newAcceptBtn.addEventListener('click', () => acceptBtn.click());
+              }
+              
+              if (newRejectBtn) {
+                newRejectBtn.addEventListener('click', () => rejectBtn.click());
+              }
+              
+              alert('No se pudo aceptar la solicitud. Inténtalo de nuevo.');
+            }
+          });
+        }
+        
+        if (rejectBtn) {
+          rejectBtn.addEventListener('click', async () => {
+            const requestId = rejectBtn.dataset.requestId;
+            if (!requestId) return;
+            
+            // Mostrar indicador de carga
+            buttonsContainer.innerHTML = `
+              <div class="text-center w-full py-2">
+                <div class="inline-block animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-purple-600"></div>
+                <span class="ml-2 text-purple-600 text-sm">Procesando...</span>
+              </div>
+            `;
+            
+            try {
+              await friends.rejectFriendRequest(requestId);
+              
+              // Mostrar mensaje de éxito
+              buttonsContainer.innerHTML = `
+                <div class="w-full py-2 bg-gray-100 text-gray-700 rounded-lg text-center">
+                  Solicitud rechazada
+                </div>
+              `;
+              
+              // Después de mostrar brevemente el mensaje, eliminar la solicitud de la vista
+              setTimeout(() => {
+                requestItem.classList.add('opacity-0', 'transform', 'scale-95', 'transition-all', 'duration-500');
+                setTimeout(() => {
+                  requestItem.remove();
+                  
+                  // Si no hay más solicitudes, ocultar el contenedor
+                  if (requestsList.children.length === 0) {
+                    friendRequestsContainer.classList.add('hidden');
+                    friendRequestsContainer.classList.remove('mb-6');
+                  }
+                }, 500);
+              }, 1500);
+            } catch (error) {
+              console.error('Error al rechazar solicitud:', error);
+              
+              // Restaurar botones en caso de error
+              buttonsContainer.innerHTML = `
+                <button class="accept-request w-1/2 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg text-sm hover:opacity-90 transition-colors flex items-center justify-center" data-request-id="${requestId}">
+                  <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  Aceptar
+                </button>
+                <button class="reject-request w-1/2 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm hover:bg-gray-300 transition-colors flex items-center justify-center" data-request-id="${requestId}">
+                  <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  Rechazar
+                </button>
+              `;
+              
+              // Añadir nuevamente los event listeners
+              const newAcceptBtn = requestItem.querySelector('.accept-request') as HTMLButtonElement;
+              const newRejectBtn = requestItem.querySelector('.reject-request') as HTMLButtonElement;
+              
+              if (newAcceptBtn) {
+                newAcceptBtn.addEventListener('click', () => acceptBtn.click());
+              }
+              
+              if (newRejectBtn) {
+                newRejectBtn.addEventListener('click', () => rejectBtn.click());
+              }
+              
+              alert('No se pudo rechazar la solicitud. Inténtalo de nuevo.');
+            }
+          });
+        }
+      });
+    } catch (error) {
+      console.error('Error al cargar solicitudes de amistad:', error);
+      friendRequestsContainer.innerHTML = `
+        <div class="bg-red-50 border border-red-200 rounded-lg p-4 text-red-600 text-center text-sm">
+          <svg class="h-5 w-5 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+          Error al cargar solicitudes. Intenta recargar la página.
+        </div>
+      `;
+    }
+  };
+
+  // Función auxiliar para mostrar el tiempo transcurrido
+  const getTimeAgo = (date: Date): string => {
+    const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
+    
+    let interval = Math.floor(seconds / 31536000);
+    if (interval >= 1) {
+      return interval === 1 ? 'hace 1 año' : `hace ${interval} años`;
+    }
+    
+    interval = Math.floor(seconds / 2592000);
+    if (interval >= 1) {
+      return interval === 1 ? 'hace 1 mes' : `hace ${interval} meses`;
+    }
+    
+    interval = Math.floor(seconds / 86400);
+    if (interval >= 1) {
+      return interval === 1 ? 'hace 1 día' : `hace ${interval} días`;
+    }
+    
+    interval = Math.floor(seconds / 3600);
+    if (interval >= 1) {
+      return interval === 1 ? 'hace 1 hora' : `hace ${interval} horas`;
+    }
+    
+    interval = Math.floor(seconds / 60);
+    if (interval >= 1) {
+      return interval === 1 ? 'hace 1 minuto' : `hace ${interval} minutos`;
+    }
+    
+    return 'hace unos segundos';
+  };
+
+  // Buscador de usuarios
+  if (searchUsersInput && searchResults) {
+    // Variable para controlar el tiempo entre búsquedas
+    let searchTimeout: ReturnType<typeof setTimeout> | null = null;
+    
+    searchUsersInput.addEventListener('input', () => {
+      // Limpiar timeout anterior
+      if (searchTimeout) {
+        clearTimeout(searchTimeout);
+      }
+      
+      // Configurar nuevo timeout para evitar demasiadas peticiones
+      searchTimeout = setTimeout(async () => {
+        const query = searchUsersInput.value.trim();
+        
+        // Si la consulta está vacía, ocultar resultados
+        if (!query) {
+          searchResults.classList.add('hidden');
+          return;
+        }
+        
+        // Mostrar un indicador de carga
+        searchResults.innerHTML = `
+          <div class="p-3 text-center text-gray-500">
+            <div class="inline-block animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-purple-600 mr-2"></div>
+            Buscando...
+          </div>
+        `;
+        searchResults.classList.remove('hidden');
+        
+        try {
+          // Buscar usuarios que coincidan con la consulta
+          const users = await friends.searchUsers(query);
+          
+          // Limpiar resultados para mostrar los nuevos
+          searchResults.innerHTML = '';
+          
+          if (!users || users.length === 0) {
+            searchResults.innerHTML = `
+              <div class="p-3 text-center text-gray-500">
+                No se encontraron usuarios con "${query}"
+              </div>
+            `;
+            return;
+          }
+          
+          // Mostrar resultados
+          users.forEach((user: any) => {
+            const userItem = document.createElement('div');
+            userItem.className = 'p-3 hover:bg-purple-50 cursor-pointer flex items-center';
+            
+            // Asegurarnos de que la URL de la imagen de perfil sea completa
+            let profileImageUrl = user.profilePicture || '/images/avatar-placeholder.png';
+            if (profileImageUrl && profileImageUrl.startsWith('/uploads/')) {
+              profileImageUrl = `http://localhost:5000${profileImageUrl}`;
+            }
+            
+            userItem.innerHTML = `
+              <img src="${profileImageUrl}" alt="${user.name}" class="h-10 w-10 rounded-full object-cover mr-3">
+              <div class="flex-1">
+                <p class="font-medium text-purple-900">${user.name}</p>
+                <p class="text-xs text-gray-500">${user.bio || user.email || 'Usuario de TellMe'}</p>
+              </div>
+              <button class="add-friend-btn text-purple-500 hover:text-purple-700 p-1" data-user-id="${user._id}">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+              </button>
+            `;
+            
+            // Añadir event listener para enviar solicitud de amistad
+            const addBtn = userItem.querySelector('.add-friend-btn') as HTMLButtonElement;
+            if (addBtn) {
+              addBtn.addEventListener('click', async (e) => {
+                e.stopPropagation(); // Evitar que el clic propague al elemento padre
+                const userId = addBtn.dataset.userId;
+                if (!userId) return;
+                
+                try {
+                  // Deshabilitar botón mientras se envía la solicitud
+                  addBtn.disabled = true;
+                  addBtn.innerHTML = `
+                    <div class="inline-block animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-purple-600"></div>
+                  `;
+                  
+                  await friends.sendFriendRequest(userId);
+                  
+                  // Cambiar el botón por un mensaje de éxito
+                  addBtn.outerHTML = `
+                    <span class="text-green-600 text-xs px-2 py-1 bg-green-50 rounded-md">
+                      <svg class="h-4 w-4 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                      </svg>
+                      Enviada
+                    </span>
+                  `;
+                } catch (error) {
+                  const errorObj = error as any; // Usar any para superar limitaciones de tipo
+                  
+                  // Verificar si es un objeto con la estructura actualizada
+                  if (errorObj && typeof errorObj === 'object' && 'isError' in errorObj) {
+                    console.log('Mensaje del servidor:', errorObj.message);
+                    
+                    // Si ya existe solicitud o son amigos, mostrar un estado diferente
+                    if (errorObj.message && (
+                        errorObj.message.includes('Ya existe una solicitud') || 
+                        errorObj.message.includes('Ya son amigos'))
+                    ) {
+                      addBtn.outerHTML = `
+                        <span class="text-gray-600 text-xs px-2 py-1 bg-gray-50 rounded-md">
+                          ${errorObj.message.includes('Ya existe una solicitud') ? 'Pendiente' : 'Amigos'}
+                        </span>
+                      `;
+                      return;
+                    }
+                    
+                    alert(errorObj.message || 'No se pudo enviar la solicitud. Inténtalo de nuevo.');
+                  } else {
+                    console.error('Error al enviar solicitud de amistad:', errorObj);
+                    alert('No se pudo enviar la solicitud. Inténtalo de nuevo.');
+                  }
+                  
+                  // Restaurar el botón y mostrar error
+                  addBtn.disabled = false;
+                  addBtn.innerHTML = `
+                    <svg class="h-5 w-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                  `;
+                  
+                  setTimeout(() => {
+                    addBtn.innerHTML = `
+                      <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                      </svg>
+                    `;
+                    addBtn.classList.remove('text-red-500');
+                    addBtn.classList.add('text-purple-500');
+                  }, 2000);
+                }
+              });
+            }
+            
+            // Añadir event listener para ver perfil
+            userItem.addEventListener('click', () => {
+              // Por ahora solo mostramos un mensaje
+              alert(`Ver perfil de ${user.name} (funcionalidad en desarrollo)`);
+            });
+            
+            searchResults.appendChild(userItem);
+          });
+        } catch (error) {
+          console.error('Error al buscar usuarios:', error);
+          searchResults.innerHTML = `
+            <div class="p-3 text-center text-red-500">
+              Error al buscar usuarios. Intenta de nuevo.
+            </div>
+          `;
+        }
+      }, 300); // Esperar 300ms después de que el usuario deje de escribir
+    });
+    
+    // Ocultar resultados cuando se hace clic fuera del buscador
+    document.addEventListener('click', (e) => {
+      if (!searchUsersInput.contains(e.target as Node) && !searchResults.contains(e.target as Node)) {
+        searchResults.classList.add('hidden');
+      }
+    });
+  }
+
+  // Toggle para mostrar posts de amigos o todos
+  if (toggleFriendMode) {
+    toggleFriendMode.addEventListener('click', () => {
+      showFriendsPostsOnly = !showFriendsPostsOnly;
+      
+      // Actualizar texto del botón
+      toggleFriendMode.textContent = showFriendsPostsOnly ? 'Ver todas las publicaciones' : 'Ver solo publicaciones de amigos';
+      
+      // Recargar posts
+      if (loadingPosts) {
+        loadingPosts.classList.remove('hidden');
+      }
+      loadPosts();
+    });
+  }
+
+  // Cargar datos al iniciar la página
   loadPosts();
+  loadFriends();
+  loadFriendRequests();
+  
+  // Configurar actualización periódica de solicitudes de amistad cada 30 segundos
+  const friendRequestsInterval = setInterval(() => {
+    loadFriendRequests();
+  }, 30000);
+  
+  // Limpiar el intervalo cuando se navegue a otra página
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') {
+      clearInterval(friendRequestsInterval);
+    }
+  });
+
+  // Inicializar los listeners de eventos 
+  friends.initializeEventListeners();
+  
+  // Escuchar cambios en los datos de amistad
+  window.addEventListener('friendshipDataChanged', function() {
+    console.log('Datos de amistad actualizados, recargando...');
+    loadFriendRequests();
+    loadFriends();
+  });
+  
+  // Escuchar nuevas solicitudes de amistad - utilizando declare para evitar errores de tipo
+  window.addEventListener('friendRequestSent', function(event) {
+    // @ts-ignore - Ignoramos el error de tipo para el evento personalizado
+    const detail = event.detail;
+    console.log('Nueva solicitud de amistad recibida:', detail);
+    
+    // Si la solicitud está dirigida al usuario actual, actualizar la interfaz
+    const currentUserId = utils.getCurrentUserId();
+    if (detail && detail.receiver === currentUserId) {
+      loadFriendRequests();
+    }
+  });
 
   // Configurar navegación con transición
   document.addEventListener('DOMContentLoaded', () => {
@@ -824,4 +1774,38 @@ import LoadingTransition from '../components/LoadingTransition.astro';
       });
     }
   });
+
+  // Agregar funcionalidad al botón de notificaciones
+  const notificationsBtn = document.getElementById('notifications-btn');
+  const initialRequestsVisibility = friendRequestsContainer?.classList.contains('hidden');
+
+  if (notificationsBtn) {
+    notificationsBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      
+      // Si hay solicitudes, mostrarlas u ocultarlas
+      if (friendRequestsContainer) {
+        if (friendRequestsContainer.classList.contains('hidden')) {
+          // Si está oculto, mostrar y hacer scroll hasta él
+          friendRequestsContainer.classList.remove('hidden');
+          friendRequestsContainer.classList.add('mb-6');
+          
+          // Animar para llamar la atención
+          friendRequestsContainer.classList.add('animate-pulse');
+          setTimeout(() => {
+            friendRequestsContainer.classList.remove('animate-pulse');
+          }, 1000);
+          
+          // Hacer scroll hasta las solicitudes
+          friendRequestsContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } else {
+          // Si ya está visible, solo hacer scroll
+          friendRequestsContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }
+      
+      // Cargar las solicitudes de nuevo para asegurarse de que estén actualizadas
+      loadFriendRequests();
+    });
+  }
 </script> 

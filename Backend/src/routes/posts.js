@@ -79,6 +79,23 @@ router.get('/', protect, async (req, res) => {
   }
 });
 
+// @route   GET /api/posts/me
+// @desc    Get posts of current user
+// @access  Private
+router.get('/me', protect, async (req, res) => {
+  try {
+    const posts = await Post.find({ user: req.user.id })
+      .sort({ createdAt: -1 })
+      .populate('user', 'name profilePicture')
+      .populate('comments.user', 'name profilePicture');
+    
+    res.json(posts);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error en el servidor' });
+  }
+});
+
 // @route   GET /api/posts/:id
 // @desc    Get a post by ID
 // @access  Private
@@ -150,23 +167,6 @@ router.post('/:id/comment', protect, async (req, res) => {
       .populate('comments.user', 'name profilePicture');
 
     res.json(updatedPost);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Error en el servidor' });
-  }
-});
-
-// @route   GET /api/posts/me
-// @desc    Get posts of current user
-// @access  Private
-router.get('/me', protect, async (req, res) => {
-  try {
-    const posts = await Post.find({ user: req.user.id })
-      .sort({ createdAt: -1 })
-      .populate('user', 'name profilePicture')
-      .populate('comments.user', 'name profilePicture');
-    
-    res.json(posts);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Error en el servidor' });
