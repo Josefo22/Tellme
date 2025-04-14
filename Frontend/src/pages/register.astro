@@ -13,6 +13,13 @@ import LoadingTransition from '../components/LoadingTransition.astro';
           <p class="text-gray-600 mt-2 sm:mt-3 font-medium">Únete a nuestra comunidad</p>
         </div>
 
+        <!-- Aviso de aplicación de prueba -->
+        <div class="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <p class="text-yellow-700 text-sm">
+            <span class="font-semibold">⚠️ Esta es una aplicación de prueba.</span> Se recomienda no utilizar contraseñas ni correos electrónicos que uses habitualmente en otros servicios.
+          </p>
+        </div>
+
         <!-- Register Form -->
         <form id="registerForm" class="space-y-4 sm:space-y-5">
           <div>
@@ -51,6 +58,22 @@ import LoadingTransition from '../components/LoadingTransition.astro';
               required
             />
           </div>
+          
+          <!-- Checkbox de términos y condiciones -->
+          <div class="flex items-start">
+            <div class="flex items-center h-5">
+              <input
+                id="terms"
+                type="checkbox"
+                class="w-4 h-4 border border-purple-300 rounded bg-white/50 focus:ring-3 focus:ring-purple-300"
+                required
+              />
+            </div>
+            <label for="terms" class="ml-2 text-sm text-gray-600">
+              Acepto los <a href="#" class="text-purple-600 hover:underline">Términos y Condiciones</a> y la <a href="#" class="text-purple-600 hover:underline">Política de Privacidad</a>
+            </label>
+          </div>
+          
           <div id="errorMessage" class="text-red-500 text-sm hidden"></div>
           <button
             type="submit"
@@ -107,6 +130,7 @@ import LoadingTransition from '../components/LoadingTransition.astro';
     const emailInput = document.getElementById('email') as HTMLInputElement;
     const passwordInput = document.getElementById('password') as HTMLInputElement;
     const confirmPasswordInput = document.getElementById('confirmPassword') as HTMLInputElement;
+    const termsInput = document.getElementById('terms') as HTMLInputElement;
     const errorMessage = document.getElementById('errorMessage');
     
     const name = nameInput?.value;
@@ -125,6 +149,14 @@ import LoadingTransition from '../components/LoadingTransition.astro';
     if (password !== confirmPassword) {
       if (errorMessage) {
         errorMessage.textContent = 'Las contraseñas no coinciden';
+        errorMessage.classList.remove('hidden');
+      }
+      return;
+    }
+    
+    if (!termsInput.checked) {
+      if (errorMessage) {
+        errorMessage.textContent = 'Debes aceptar los términos y condiciones';
         errorMessage.classList.remove('hidden');
       }
       return;
