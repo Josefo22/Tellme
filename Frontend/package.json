@@ -4,7 +4,8 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "prebuild": "node -e \"const fs = require('fs'); fs.copyFileSync('src/utils/api-init.js', 'public/api-init.js');\"",
+    "build": "npm run prebuild && astro build",
     "preview": "astro preview",
     "astro": "astro"
   },
