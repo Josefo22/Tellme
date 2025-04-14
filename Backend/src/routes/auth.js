@@ -4,6 +4,10 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const { protect } = require('../middleware/auth');
 
+// Asegurar que siempre haya un JWT_SECRET
+const JWT_SECRET = process.env.JWT_SECRET || 'una_clave_secreta_muy_larga_y_segura_123456789';
+const JWT_EXPIRE = process.env.JWT_EXPIRE || '30d';
+
 // @route   POST /api/auth/register
 // @desc    Register user
 // @access  Public
@@ -29,8 +33,8 @@ router.post('/register', async (req, res) => {
     // Create token
     const token = jwt.sign(
       { id: user._id },
-      process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRE }
+      JWT_SECRET,
+      { expiresIn: JWT_EXPIRE }
     );
 
     res.status(201).json({
@@ -42,7 +46,7 @@ router.post('/register', async (req, res) => {
       }
     });
   } catch (error) {
-    console.error(error);
+    console.error('Error en registro:', error);
     res.status(500).json({ message: 'Error en el servidor' });
   }
 });
@@ -69,8 +73,8 @@ router.post('/login', async (req, res) => {
     // Create token
     const token = jwt.sign(
       { id: user._id },
-      process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRE }
+      JWT_SECRET,
+      { expiresIn: JWT_EXPIRE }
     );
 
     res.json({
@@ -82,7 +86,7 @@ router.post('/login', async (req, res) => {
       }
     });
   } catch (error) {
-    console.error(error);
+    console.error('Error en login:', error);
     res.status(500).json({ message: 'Error en el servidor' });
   }
 });
