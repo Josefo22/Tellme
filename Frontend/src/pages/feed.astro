@@ -4,8 +4,31 @@ import LoadingTransition from '../components/LoadingTransition.astro';
 ---
 <LoadingTransition />
 <Layout title="TellMe - Feed">
-  <!-- Añadir meta tag para asegurar UTF-8 -->
+  <!-- Add meta tag to ensure UTF-8 -->
   <meta charset="UTF-8" slot="head"/>
+  
+  <!-- Cargar API directamente desde archivo externo -->
+  <script is:inline src="/src/utils/api-init.js"></script>
+  
+  <!-- Script auxiliar que no redeclara variables globales -->
+  <script is:inline>
+    // Verificar si API_URL ya existe antes de declararlo
+    if (typeof window.API_URL === 'undefined') {
+      window.API_URL = window.location.hostname !== 'localhost' && !window.location.hostname.includes('127.0.0.1')
+        ? 'https://app-pro-backend.onrender.com/api'
+        : 'http://localhost:5000/api';
+    }
+    
+    // Verificar si ya existen las funciones de utilidad
+    if (!window.utils || !window.utils.getToken) {
+      // Solo definirlas si no existen
+      window.utils = window.utils || {};
+      window.utils.getToken = window.utils.getToken || (() => localStorage.getItem('token'));
+      window.utils.setToken = window.utils.setToken || ((token) => localStorage.setItem('token', token));
+      window.utils.removeToken = window.utils.removeToken || (() => localStorage.removeItem('token'));
+      window.utils.isAuthenticated = window.utils.isAuthenticated || (() => !!window.utils.getToken());
+    }
+  </script>
   <div class="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-50">
     <!-- Navbar estilo modernizado -->
     <nav class="bg-white/80 backdrop-blur-sm shadow-lg fixed w-full top-0 z-50 border-b border-purple-100">
@@ -144,12 +167,20 @@ import LoadingTransition from '../components/LoadingTransition.astro';
                   TM
                 </div>
               </div>
-              <button class="w-full px-4 py-3 border border-purple-200 rounded-full bg-purple-50 text-left text-gray-500 hover:bg-purple-100 transition-colors text-sm" id="openPostModal">
+              <button 
+                class="w-full px-4 py-3 border border-purple-200 rounded-full bg-purple-50 text-left text-gray-500 hover:bg-purple-100 transition-colors text-sm" 
+                id="openPostModal"
+                onclick="document.getElementById('postModal').classList.remove('hidden');"
+              >
                 Que hay de nuevo?
               </button>
             </div>
             <div class="flex justify-between items-center border-t border-purple-100 pt-4">
-              <button class="flex items-center px-3 py-2 rounded-lg hover:bg-purple-50 transition-colors text-sm" id="uploadMediaBtn">
+              <button 
+                class="flex items-center px-3 py-2 rounded-lg hover:bg-purple-50 transition-colors text-sm" 
+                id="uploadMediaBtn"
+                onclick="document.getElementById('postModal').classList.remove('hidden');"
+              >
                 <svg class="h-6 w-6 mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
@@ -252,7 +283,7 @@ import LoadingTransition from '../components/LoadingTransition.astro';
     <div id="postModal" class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 hidden">
       <div class="bg-white rounded-xl w-full max-w-lg mx-4 shadow-xl overflow-hidden">
         <div class="flex justify-between items-center p-4 border-b border-purple-100">
-          <h3 class="text-lg sm:text-xl font-semibold text-purple-900">Crear publicación</h3>
+          <h3 class="text-lg sm:text-xl font-semibold text-purple-900">Crear publicacion</h3>
           <button id="closePostModal" class="text-gray-500 hover:text-gray-700">
             <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -280,7 +311,7 @@ import LoadingTransition from '../components/LoadingTransition.astro';
               </div>
             </div>
           </div>
-          <textarea id="postContent" class="w-full p-3 min-h-[120px] text-gray-800 text-lg focus:outline-none resize-none" placeholder="¿Qué hay por aquí?"></textarea>
+          <textarea id="postContent" class="w-full p-3 min-h-[120px] text-gray-800 text-lg focus:outline-none resize-none" placeholder="Q hay por aqui?"></textarea>
           <div id="mediaPreview" class="mb-4 hidden">
             <div class="relative">
               <img id="previewImage" src="" alt="Vista previa" class="max-h-60 rounded-lg mx-auto">
@@ -354,26 +385,10 @@ import LoadingTransition from '../components/LoadingTransition.astro';
         <div id="commentsList" class="space-y-4 max-h-60 sm:max-h-80 overflow-y-auto mb-4">
           <!-- Los comentarios se cargarán dinámicamente aquí -->
           <p class="text-center text-gray-500 py-3" id="commentsLoading">Cargando comentarios...</p>
-          <p class="text-center text-gray-500 py-3 hidden" id="noCommentsMessage">No hay comentarios. ¡Sé el primero en comentar!</p>
+          <p class="text-center text-gray-500 py-3 hidden" id="noCommentsMessage">No hay comentarios. ¡Se el primero en comentar!</p>
         </div>
         
         <!-- Formulario para nuevo comentario -->
-        <div class="flex items-start space-x-3">
-          <div class="relative h-8 w-8 rounded-full overflow-hidden flex-shrink-0">
-            <img src="/images/avatar-placeholder.png" alt="Tu perfil" class="h-full w-full object-cover user-profile-image">
-            <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-purple-500 to-indigo-600 text-white font-bold user-initials text-xs">
-              TU
-            </div>
-          </div>
-          <div class="flex-grow relative">
-            <textarea 
-              id="newCommentText" 
-              class="w-full rounded-full border border-gray-300 py-2 px-4 pr-12 focus:outline-none focus:ring-2 focus:ring-purple-300 resize-none"
-              placeholder="Escribe un comentario..."
-              rows="1"
-            ></textarea>
-            <button id="submitCommentBtn" class="absolute right-3 top-2 text-purple-600 hover:text-purple-800">
-              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <div class="flex">
           <input type="text" id="commentInput" class="flex-1 p-3 border border-gray-200 rounded-l-xl focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Escribe un comentario...">
           <button id="submitCommentBtn" class="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-r-xl hover:opacity-90 transition-colors">
@@ -381,6 +396,11 @@ import LoadingTransition from '../components/LoadingTransition.astro';
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
             </svg>
           </button>
+        </div>
+        <!-- Indicador de carga de envío de comentario -->
+        <div id="commentSubmitLoading" class="text-center mt-2 hidden">
+          <div class="inline-block animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-purple-600 mr-1"></div>
+          <span class="text-xs text-purple-600">Enviando comentario...</span>
         </div>
       </div>
     </div>
@@ -397,378 +417,789 @@ import LoadingTransition from '../components/LoadingTransition.astro';
       scroll-behavior: auto !important;
     }
   }
+  
+  /* Animación para nuevos comentarios */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .animate-fadeIn {
+    animation: fadeIn 0.3s ease-out forwards;
+  }
 </style>
 
 <script>
-  // @ts-ignore
-  import { auth, posts, users, friends, utils } from '../utils/api.js';
-
-  // Control del menú móvil
-  const mobileMenuButton = document.getElementById('mobile-menu-button');
-  const mobileMenu = document.getElementById('mobile-menu');
-  const mobileLogoutBtn = document.getElementById('mobile-logoutBtn');
-  
-  // Alternar menú móvil
-  if (mobileMenuButton && mobileMenu) {
-    mobileMenuButton.addEventListener('click', () => {
-      mobileMenu.classList.toggle('hidden');
-    });
+  // Extender el tipo Window para permitir propiedades personalizadas
+  interface Window {
+    auth: {
+      getCurrentUser: () => Promise<any>;
+      logout: () => void;
+    };
+    utils: {
+      isAuthenticated: () => boolean;
+      getToken: () => string | null;
+      setToken: (token: string) => void;
+      removeToken: () => void;
+    };
+    posts: {
+      getAll: (friendsOnly?: boolean) => Promise<any[]>;
+      getComments: (postId: string) => Promise<any[]>;
+      comment: (postId: string, content: string) => Promise<any>;
+      like: (postId: string) => Promise<any>;
+      create: (postData: any) => Promise<any>;
+    };
+    friends: {
+      getFriends: () => Promise<any[]>;
+    };
+    abrirModal: (id: string) => void;
   }
   
-  // Asegurarse de que el botón de logout móvil funcione igual que el de escritorio
-  if (mobileLogoutBtn) {
-    mobileLogoutBtn.addEventListener('click', () => {
-      auth.logout();
-      window.location.href = '/';
-    });
-  }
-
-  // Resto del script existente
-  // Verificar si el usuario está autenticado
-  if (!utils.isAuthenticated()) {
-    window.location.href = '/';
-  }
-
-  // Elementos del DOM
-  const postsContainer = document.getElementById('postsContainer');
-  const loadingPosts = document.getElementById('loadingPosts');
-  const toggleFriendMode = document.getElementById('toggleFriendMode');
-  const mobileToggleFriendMode = document.getElementById('mobile-toggleFriendMode');
-  const logoutBtn = document.getElementById('logoutBtn');
-  const openPostModal = document.getElementById('openPostModal');
-  const closePostModal = document.getElementById('closePostModal');
-  const postModal = document.getElementById('postModal');
-  const postContent = document.getElementById('postContent') as HTMLTextAreaElement;
-  const submitPostBtn = document.getElementById('submitPostBtn');
-  const uploadMediaBtn = document.getElementById('uploadMediaBtn');
-  const addMediaBtn = document.getElementById('addMediaBtn');
-  const removeMediaBtn = document.getElementById('removeMediaBtn');
-  const mediaPreview = document.getElementById('mediaPreview');
-  const previewImage = document.getElementById('previewImage') as HTMLImageElement;
-  const commentModal = document.getElementById('commentModal');
-  const closeCommentModal = document.getElementById('closeCommentModal');
-  const commentModalAuthorName = document.getElementById('commentModalAuthorName');
-  const commentModalAuthorImg = document.getElementById('commentModalAuthorImg') as HTMLImageElement;
-  const commentModalAuthorInitials = document.getElementById('commentModalAuthorInitials');
-  const commentModalDate = document.getElementById('commentModalDate');
-  const commentModalContent = document.getElementById('commentModalContent');
-  const commentModalImage = document.getElementById('commentModalImage') as HTMLImageElement;
-  const commentModalImageContainer = document.getElementById('commentModalImageContainer');
-  const commentsList = document.getElementById('commentsList');
-  const commentsLoading = document.getElementById('commentsLoading');
-  const noCommentsMessage = document.getElementById('noCommentsMessage');
-  const newCommentText = document.getElementById('newCommentText') as HTMLTextAreaElement;
-  const submitCommentBtn = document.getElementById('submitCommentBtn');
-  const requestIndicator = document.getElementById('request-indicator');
-  const mobileRequestIndicator = document.getElementById('mobile-request-indicator');
-  const searchUsersInput = document.getElementById('searchUsers') as HTMLInputElement;
-  const searchResults = document.getElementById('searchResults');
-  const friendRequestsContainer = document.getElementById('friendRequestsContainer');
-  const mobileFriendRequestsContainer = document.getElementById('mobile-friendRequestsContainer');
-  const mobileFriendsList = document.getElementById('mobile-friendsList');
-  const modalUserName = document.getElementById('modalUserName');
-  
-  // Variables para el estado de la aplicación
+  // Variables principales con tipos definidos
   let currentUser: any = null;
+  let showFriendsPostsOnly: boolean = false;
+  let postsContainer: HTMLElement | null = null;
+  let loadingPosts: HTMLElement | null = null;
+  let modalUserName: HTMLElement | null = null;
+  let toggleFriendMode: HTMLElement | null = null;
+  let mobileToggleFriendMode: HTMLElement | null = null;
+  let logoutBtn: HTMLElement | null = null;
+  let mobileLogoutBtn: HTMLElement | null = null;
+  let postModal: HTMLElement | null = null;
+  let postContent: HTMLTextAreaElement | null = null;
+  let submitPostBtn: HTMLElement | null = null;
+  let friendsContainer: HTMLElement | null = null;
+  let mobileFriendsContainer: HTMLElement | null = null;
   let selectedPostId: string | null = null;
-  let showFriendsPostsOnly: boolean = true;
-  let pendingRequests: any[] = [];
   let imageBase64: string | null = null;
   
-  // Definir interfaces para post y comentario
-  interface User {
-    _id: string;
-    name: string;
-    email: string;
-    profilePicture?: string;
-  }
-  
-  interface Post {
-    _id: string;
-    content: string;
-    user: User;
-    createdAt: string;
-    updatedAt: string;
-    likes: string[];
-    comments: string[];
-    image?: string;
-  }
-  
-  interface Comment {
-    _id: string;
-    content: string;
-    user: User;
-    post: string;
-    createdAt: string;
-    updatedAt: string;
-  }
-  
-  // Actualizar los indicadores de solicitudes de amistad tanto en móvil como en escritorio
-  function updateRequestIndicators(count: number) {
-    if (requestIndicator && mobileRequestIndicator) {
-      if (count > 0) {
-        requestIndicator.textContent = count.toString();
-        requestIndicator.classList.remove('hidden');
-        
-        mobileRequestIndicator.textContent = count.toString();
-        mobileRequestIndicator.classList.remove('hidden');
-      } else {
-        requestIndicator.classList.add('hidden');
-        mobileRequestIndicator.classList.add('hidden');
+  // Función para abrir modales
+  function abrirModal(id: string): void {
+    try {
+      const modal = document.getElementById(id);
+      if (modal) {
+        modal.classList.remove('hidden');
       }
+    } catch (error) {
+      console.error("Error al abrir modal:", error);
     }
   }
-
-  // Cargar datos del usuario
-  async function loadCurrentUser() {
+  
+  // Asignar al objeto window
+  (window as any).abrirModal = abrirModal;
+  
+  // Esperar a que el documento esté listo
+  document.addEventListener('DOMContentLoaded', () => {
+    console.log('Feed: documento cargado');
+    initDOM();
+    initApp();
+  });
+  
+  // Inicializar elementos DOM cuando el documento esté listo
+  function initDOM(): void {
+    postsContainer = document.getElementById('postsContainer');
+    loadingPosts = document.getElementById('loadingPosts');
+    modalUserName = document.getElementById('modalUserName');
+    toggleFriendMode = document.getElementById('toggleFriendMode');
+    mobileToggleFriendMode = document.getElementById('mobile-toggleFriendMode');
+    logoutBtn = document.getElementById('logoutBtn');
+    mobileLogoutBtn = document.getElementById('mobile-logoutBtn');
+    postModal = document.getElementById('postModal');
+    postContent = document.getElementById('postContent') as HTMLTextAreaElement;
+    submitPostBtn = document.getElementById('submitPostBtn');
+    friendsContainer = document.querySelector('.space-y-4');
+    mobileFriendsContainer = document.getElementById('mobile-friendsList');
+    
+    console.log('Elementos DOM inicializados:', {
+      postsContainer,
+      loadingPosts,
+      friendsContainer,
+      mobileFriendsContainer
+    });
+  }
+  
+  // Inicializar la aplicación
+  function initApp(): void {
+    console.log('----- INICIALIZANDO FEED -----');
+    
+    // Verificar si el usuario está autenticado
+    const utils = (window as any).utils;
+    console.log('Estado de autenticación:', {
+      utils: !!utils,
+      tokenExiste: utils && utils.getToken ? !!utils.getToken() : null,
+      estaAutenticado: utils && utils.isAuthenticated ? utils.isAuthenticated() : null
+    });
+    
+    const isAuthenticated = typeof window !== 'undefined' && 
+                          utils && 
+                          typeof utils.isAuthenticated === 'function' && 
+                          utils.isAuthenticated();
+                          
+    if (!isAuthenticated) {
+      console.log('Usuario no autenticado, redirigiendo a login');
+      window.location.href = '/';
+      return;
+    }
+    
+    // Asegurar que los elementos del DOM necesarios estén presentes
+    if (!postModal) {
+      console.error('Error: Modal de publicación no encontrado');
+    }
+    
+    if (!postsContainer) {
+      console.error('Error: Contenedor de posts no encontrado');
+    }
+    
+    // Configurar eventos de botones
+    setupButtonEvents();
+    
+    // Cargar usuario y publicaciones
     try {
-      currentUser = await auth.getCurrentUser();
+      // Primero cargar usuario y luego posts
+      loadCurrentUser().then(() => {
+        // Configurar componentes
+        setupPostModal();
+        
+        // Cargar posts y amigos
+        loadPosts();
+        loadFriends();
+      }).catch(error => {
+        console.error('Error inicializando:', error);
+      });
+    } catch (error) {
+      console.error('Error en la inicialización:', error);
+    }
+  }
+  
+  // Función para cargar datos del usuario actual
+  async function loadCurrentUser(): Promise<void> {
+    try {
+      console.log('Cargando datos del usuario actual...');
+      if (!(window as any).auth || !(window as any).auth.getCurrentUser) {
+        console.error('La función auth.getCurrentUser no está disponible');
+        return;
+      }
+      currentUser = await (window as any).auth.getCurrentUser();
+      console.log('Usuario cargado:', currentUser);
       
-      // Actualizar el nombre del usuario en el modal de crear post
       if (modalUserName) {
         modalUserName.textContent = currentUser.name;
       }
       
-      // Actualizar la imagen del usuario en todas partes
       updateUserImages();
-      
     } catch (error) {
       console.error('Error al cargar datos del usuario:', error);
     }
   }
   
-  // Cargar las publicaciones
-  async function loadPosts() {
-    if (!postsContainer || !loadingPosts) return;
+  // Función principal para cargar publicaciones
+  async function loadPosts(): Promise<void> {
+    console.log('Iniciando carga de publicaciones...');
     
-    try {
-      // Mostrar indicador de carga
-      loadingPosts.classList.remove('hidden');
-      
-      // Obtener los posts
-      const allPosts = await posts.getAll(showFriendsPostsOnly);
-      
-      // Ocultar indicador de carga
-      loadingPosts.classList.add('hidden');
-      
-      // Limpiar el contenedor antes de añadir nuevos posts
-      postsContainer.innerHTML = '';
-      
-      // Si no hay posts, mostrar mensaje
-      if (!allPosts || allPosts.length === 0) {
-        const noPostsElement = document.createElement('div');
-        noPostsElement.className = 'text-center py-8 bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-purple-100';
-        noPostsElement.innerHTML = `
-          <p class="text-purple-600">No hay publicaciones para mostrar</p>
-          <p class="text-gray-500 text-sm mt-2">Sé el primero en compartir algo</p>
-        `;
-        postsContainer.appendChild(noPostsElement);
+    // Verificar si el contenedor de posts existe
+    if (!postsContainer) {
+      postsContainer = document.getElementById('postsContainer');
+      if (!postsContainer) {
+        console.error('No se encontró el contenedor de posts');
         return;
       }
-      
-      // Renderizar cada post
-      allPosts.forEach((post: Post) => {
-        // Formatear fecha relativa
-        const relativeTime = formatRelativeTime(post.createdAt);
-        
-        // Asegurarnos de que la URL de la imagen de perfil sea completa
-        let profileImageUrl = post.user.profilePicture || '/images/avatar-placeholder.png';
-        if (profileImageUrl && profileImageUrl.startsWith('/uploads/')) {
-          profileImageUrl = `http://localhost:5000${profileImageUrl}`;
-        }
-        
-        // Crear elemento del post
-        const postElement = document.createElement('div');
-        postElement.className = 'bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-purple-100 overflow-hidden';
-        postElement.innerHTML = `
-          <div class="p-4">
-            <div class="flex items-start space-x-3">
-              <div class="relative h-10 w-10 rounded-full overflow-hidden flex-shrink-0">
-                <img src="${profileImageUrl}" alt="${post.user.name}" class="h-full w-full object-cover">
-                <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-purple-500 to-indigo-600 text-white font-bold ${post.user.profilePicture ? 'hidden' : ''}">
-                  ${getInitials(post.user.name)}
-                </div>
-              </div>
-              <div class="flex-1 min-w-0">
-                <p class="font-medium text-purple-900">${post.user.name}</p>
-                <p class="text-xs text-gray-500">${relativeTime}</p>
-              </div>
-            </div>
-            <div class="mt-3">
-              <p class="text-gray-800 whitespace-pre-line">${post.content}</p>
-            </div>
-            ${post.image ? `
-              <div class="mt-3">
-                <img src="http://localhost:5000${post.image}" alt="Imagen de la publicación" class="w-full h-auto rounded-lg">
-              </div>
-            ` : ''}
-          </div>
-          <div class="flex border-t border-purple-100">
-            <button class="flex-1 py-2 hover:bg-purple-50 transition-colors flex items-center justify-center gap-1 like-button" data-post-id="${post._id}">
-              <svg class="h-5 w-5 ${post.likes.includes(currentUser?._id) ? 'text-red-500 fill-red-500' : 'text-gray-500'}" 
-                ${post.likes.includes(currentUser?._id) ? 'fill="currentColor"' : 'fill="none"'} stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-              </svg>
-              <span class="text-sm">${post.likes.length} Me gusta</span>
-            </button>
-            <button class="flex-1 py-2 hover:bg-purple-50 transition-colors flex items-center justify-center gap-1 comment-button" data-post-id="${post._id}">
-              <svg class="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-              </svg>
-              <span class="text-sm">${post.comments.length} Comentarios</span>
-            </button>
-          </div>
+    }
+    
+    // Buscar o crear el elemento de carga
+    if (!loadingPosts) {
+      loadingPosts = document.getElementById('loadingPosts');
+      if (!loadingPosts) {
+        loadingPosts = document.createElement('div');
+        loadingPosts.id = 'loadingPosts';
+        loadingPosts.className = 'text-center py-8 bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-purple-100';
+        loadingPosts.innerHTML = `
+          <div class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-purple-600"></div>
+          <p class="mt-2 text-purple-600">Cargando publicaciones...</p>
         `;
-        
-        // Añadir el post al contenedor
-        postsContainer.appendChild(postElement);
-        
-        // Añadir event listeners a los botones
-        const likeButton = postElement.querySelector('.like-button');
-        const commentButton = postElement.querySelector('.comment-button');
-        
-        if (likeButton) {
-          likeButton.addEventListener('click', () => {
-            handleLikePost(post._id);
-          });
-        }
-        
-        if (commentButton) {
-          commentButton.addEventListener('click', () => {
-            openComments(post);
-          });
-        }
-      });
+        postsContainer.appendChild(loadingPosts);
+      }
+    }
+    
+    // Mostrar indicador de carga
+    if (loadingPosts) {
+      loadingPosts.style.display = 'block';
+    }
+    
+    try {
+      // Verificar que la función posts.getAll existe
+      if (!(window as any).posts || !(window as any).posts.getAll) {
+        console.error('La función posts.getAll no está disponible');
+        throw new Error('La API de publicaciones no está disponible');
+      }
+      console.log('Obteniendo publicaciones con friendsOnly=', showFriendsPostsOnly);
+      // Obtener posts desde la API
+      const postsData = await (window as any).posts.getAll(showFriendsPostsOnly);
+      console.log('Publicaciones obtenidas:', postsData);
+      
+      // Procesar los datos obtenidos
+      processPosts(postsData);
     } catch (error) {
       console.error('Error al cargar publicaciones:', error);
-      
-      // Mostrar mensaje de error
-      loadingPosts.classList.add('hidden');
-      
-      const errorElement = document.createElement('div');
-      errorElement.className = 'text-center py-8 bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-purple-100';
-      errorElement.innerHTML = `
-        <svg class="h-12 w-12 text-red-500 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-        </svg>
-        <p class="text-red-600">No se pudieron cargar las publicaciones</p>
-        <p class="text-gray-500 text-sm mt-2">Por favor, inténtalo de nuevo más tarde</p>
-        <button id="retryLoadPosts" class="mt-4 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">Reintentar</button>
-      `;
-      postsContainer.appendChild(errorElement);
-      
-      // Añadir event listener al botón de reintentar
-      const retryButton = errorElement.querySelector('#retryLoadPosts');
-      if (retryButton) {
-        retryButton.addEventListener('click', loadPosts);
+    } finally {
+      // Ocultar indicador de carga
+      if (loadingPosts) {
+        loadingPosts.style.display = 'none';
       }
     }
   }
   
-  // Manejar dar me gusta a un post
-  async function handleLikePost(postId: string) {
+  // Funciones que faltan implementar
+  function setupButtonEvents(): void {
+    // Configurar botón de logout
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', handleLogout);
+    }
+    
+    if (mobileLogoutBtn) {
+      mobileLogoutBtn.addEventListener('click', handleLogout);
+    }
+    
+    // Configurar botones de modo de amigos
+    if (toggleFriendMode) {
+      toggleFriendMode.addEventListener('click', toggleFriendOnlyMode);
+    }
+    
+    if (mobileToggleFriendMode) {
+      mobileToggleFriendMode.addEventListener('click', toggleFriendOnlyMode);
+    }
+  }
+  function handleLogout(): void {
+    if ((window as any).auth && (window as any).auth.logout) {
+      (window as any).auth.logout();
+      window.location.href = '/';
+    }
+  }
+  
+  function toggleFriendOnlyMode(): void {
+    showFriendsPostsOnly = !showFriendsPostsOnly;
+    
+    const buttonText = showFriendsPostsOnly ? 'Ver todas las publicaciones' : 'Ver solo amigos';
+    
+    if (toggleFriendMode) {
+      toggleFriendMode.textContent = buttonText;
+    }
+    
+    if (mobileToggleFriendMode) {
+      mobileToggleFriendMode.textContent = buttonText;
+    }
+    
+    loadPosts();
+  }
+  
+  function setupPostModal(): void {
+    // Configurar modal para crear post
+    if (postModal && submitPostBtn && postContent) {
+      // Configurar botón de cierre
+      const closePostModal = document.getElementById('closePostModal');
+      if (closePostModal) {
+        closePostModal.addEventListener('click', () => {
+          postModal!.classList.add('hidden');
+        });
+      }
+      
+      // Configurar botón de enviar
+      submitPostBtn.addEventListener('click', submitPost);
+    }
+  }
+  
+  async function submitPost(): Promise<void> {
+    if (!postContent || !postModal) return;
+    
+    const content = postContent.value.trim();
+    if (!content) {
+      alert('La publicación no puede estar vacía');
+      return;
+    }
+    
     try {
-      await posts.likePost(postId);
-      // Recargar los posts para mostrar el estado actualizado
+      // Crear objeto de post con contenido e imagen (si existe)
+      const postData: any = { content };
+      if (imageBase64) {
+        postData.image = imageBase64;
+      }
+      
+      // @ts-ignore
+      await window.posts.create(postData);
+      
+      // Limpiar formulario y cerrar modal
+      postContent.value = '';
+      imageBase64 = null;
+      postModal.classList.add('hidden');
+      
+      // Recargar posts
       loadPosts();
     } catch (error) {
-      console.error('Error al dar me gusta:', error);
+      console.error('Error al crear post:', error);
+      alert('Error al crear la publicación');
     }
   }
   
-  // Abrir modal de comentarios
-  function openComments(post: Post) {
-    if (!commentModal || !commentModalAuthorName || !commentModalContent || !commentModalDate) return;
+  function updateUserImages(): void {
+    const userImages = document.querySelectorAll('.user-profile-image');
+    const userInitials = document.querySelectorAll('.user-initials');
     
-    selectedPostId = post._id;
-    
-    // Establecer datos del post en el modal
-    commentModalAuthorName.textContent = post.user.name;
-    commentModalContent.textContent = post.content;
-    commentModalDate.textContent = formatRelativeTime(post.createdAt);
-    
-    // Gestionar la imagen de perfil del autor
-    if (commentModalAuthorImg && commentModalAuthorInitials) {
-      if (post.user.profilePicture) {
-        let profileImageUrl = post.user.profilePicture;
-        if (profileImageUrl.startsWith('/uploads/')) {
-          profileImageUrl = `http://localhost:5000${profileImageUrl}`;
+    if (currentUser) {
+      // Actualizar todas las imágenes de usuario
+      userImages.forEach((img: Element) => {
+        const imgElement = img as HTMLImageElement;
+        if (currentUser.profilePicture) {
+          imgElement.src = currentUser.profilePicture;
+          imgElement.style.display = 'block';
+        } else {
+          imgElement.style.display = 'none';
+        }
+      });
+      
+      // Actualizar iniciales en caso de no tener imagen
+      userInitials.forEach((div: Element) => {
+        if (!currentUser.profilePicture) {
+          const divElement = div as HTMLElement;
+          divElement.style.display = 'flex';
+          
+          // Generar iniciales (primeras letras del nombre)
+          const nameParts = currentUser.name.split(' ');
+          let initials = '';
+          
+          if (nameParts.length >= 2) {
+            initials = nameParts[0][0] + nameParts[1][0];
+          } else if (nameParts.length === 1) {
+            initials = nameParts[0][0];
+          } else {
+            initials = 'U';
+          }
+          
+          divElement.textContent = initials.toUpperCase();
+        } else {
+          const divElement = div as HTMLElement;
+          divElement.style.display = 'none';
+        }
+      });
+    }
+  }
+  
+  async function loadFriends(): Promise<void> {
+    try {
+      // @ts-ignore
+      if (!window.friends?.getFriends) {
+        console.error('La función friends.getFriends no está disponible');
+        return;
+      }
+      const friends = await (window as any).friends.getFriends();
+      
+      // Actualizar lista de amigos (implementación básica)
+      if (friendsContainer) {
+        friendsContainer.innerHTML = '';
+        
+        if (friends.length === 0) {
+          friendsContainer.innerHTML = '<li class="text-center text-gray-500 py-2">No tienes contactos todavía</li>';
+          return;
         }
         
-        commentModalAuthorImg.src = profileImageUrl;
-        commentModalAuthorImg.classList.remove('hidden');
-        commentModalAuthorInitials.classList.add('hidden');
+        friends.forEach((friend: { name: string; profilePicture?: string }) => {
+          const friendItem = document.createElement('li');
+          friendItem.className = 'flex items-center p-2 rounded-lg hover:bg-purple-50 transition-colors';
+          
+          friendItem.innerHTML = `
+            <div class="relative h-10 w-10 rounded-full overflow-hidden flex-shrink-0 mr-3 shadow-md">
+              <img src="${friend.profilePicture || '/images/avatar-placeholder.png'}" alt="${friend.name}" class="h-full w-full object-cover">
+            </div>
+            <span class="text-sm font-medium text-gray-700">${friend.name}</span>
+          `;
+          
+          friendsContainer!.appendChild(friendItem);
+        });
+      }
+      
+      // Actualizar lista móvil de amigos
+      if (mobileFriendsContainer) {
+        mobileFriendsContainer.innerHTML = '';
+        
+        if (friends.length === 0) {
+          mobileFriendsContainer.innerHTML = '<div class="text-center text-gray-500 py-2 w-full">No tienes contactos todavía</div>';
+          return;
+        }
+        
+        friends.forEach((friend: { name: string; profilePicture?: string }) => {
+          const friendItem = document.createElement('div');
+          friendItem.className = 'flex-shrink-0 text-center';
+          
+          friendItem.innerHTML = `
+            <div class="relative h-12 w-12 rounded-full overflow-hidden shadow-md mx-auto mb-1">
+              <img src="${friend.profilePicture || '/images/avatar-placeholder.png'}" alt="${friend.name}" class="h-full w-full object-cover">
+            </div>
+            <span class="text-xs font-medium text-gray-700 block truncate w-16">${friend.name.split(' ')[0]}</span>
+          `;
+          
+          mobileFriendsContainer!.appendChild(friendItem);
+        });
+      }
+    } catch (error) {
+      console.error('Error al cargar amigos:', error);
+    }
+  }
+  
+  function processPosts(posts: any[]): void {
+    if (!postsContainer) return;
+    
+    // Limpiar contenedor actual excepto el indicador de carga
+    const children = Array.from(postsContainer.children);
+    children.forEach(child => {
+      if (child.id !== 'loadingPosts') {
+        child.remove();
+      }
+    });
+    
+    // Mostrar mensaje si no hay posts
+    if (!posts || posts.length === 0) {
+      const noPostsMessage = document.createElement('div');
+      noPostsMessage.className = 'bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-6 text-center border border-purple-100';
+      noPostsMessage.innerHTML = `
+        <svg class="h-12 w-12 mx-auto text-purple-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+        </svg>
+        <h3 class="mt-2 text-gray-700 font-medium">No hay publicaciones para mostrar</h3>
+        <p class="text-gray-500 text-sm mt-1">¡Sé el primero en crear una publicación!</p>
+      `;
+      postsContainer.appendChild(noPostsMessage);
+      return;
+    }
+    
+    // Renderizar los posts
+    posts.forEach(post => renderPost(post));
+  }
+  
+  function renderPost(post: any): void {
+    if (!postsContainer) return;
+    
+    // Crear elemento de post
+    const postElement = document.createElement('div');
+    postElement.className = 'bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-purple-100 overflow-hidden';
+    postElement.dataset.postId = post._id;
+    
+    // Formatear fecha
+    const postDate = new Date(post.createdAt);
+    const timeAgo = formatRelativeTime(postDate);
+    
+    // Generar HTML del post
+    postElement.innerHTML = `
+      <div class="p-4">
+        <div class="flex items-start space-x-3">
+          <div class="relative h-10 w-10 rounded-full overflow-hidden flex-shrink-0">
+            <img src="${post.user.profilePicture || '/images/avatar-placeholder.png'}" alt="${post.user.name}" class="h-full w-full object-cover">
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="font-semibold text-gray-900">${post.user.name}</p>
+            <p class="text-xs text-gray-500">${timeAgo}</p>
+            <div class="mt-2 text-gray-800 whitespace-pre-wrap break-words">${post.content}</div>
+            ${post.image ? `<img src="${post.image}" alt="Imagen de publicación" class="mt-3 rounded-lg max-h-96 w-auto">` : ''}
+          </div>
+        </div>
+      </div>
+      
+      <div class="flex items-center bg-gray-50 px-4 py-2 border-t border-gray-100">
+        <button class="flex items-center space-x-1 text-gray-600 hover:text-blue-600 transition-colors like-btn" data-post-id="${post._id}">
+          <svg class="h-5 w-5 ${post.likes.includes(currentUser?._id) ? 'text-blue-600 fill-current' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905v.714c0 .596-.329 1.142-.86 1.42L7 8" />
+          </svg>
+          <span class="text-sm like-count">${post.likes.length}</span>
+        </button>
+        
+        <button class="flex items-center space-x-1 text-gray-600 hover:text-purple-600 transition-colors ml-4 comment-btn" data-post-id="${post._id}">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+          </svg>
+          <span class="text-sm">${post.comments.length}</span>
+        </button>
+      </div>
+    `;
+    
+    // Añadir el post al contenedor
+    postsContainer.appendChild(postElement);
+    
+    // Configurar eventos de los botones del post
+    setupPostButtons(postElement, post);
+  }
+  
+  function formatRelativeTime(date: Date): string {
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+    
+    if (diffInSeconds < 60) {
+      return 'Hace un momento';
+    }
+    
+    const diffInMinutes = Math.floor(diffInSeconds / 60);
+    if (diffInMinutes < 60) {
+      return `Hace ${diffInMinutes} ${diffInMinutes === 1 ? 'minuto' : 'minutos'}`;
+    }
+    
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    if (diffInHours < 24) {
+      return `Hace ${diffInHours} ${diffInHours === 1 ? 'hora' : 'horas'}`;
+    }
+    
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays < 30) {
+      return `Hace ${diffInDays} ${diffInDays === 1 ? 'día' : 'días'}`;
+    }
+    
+    const diffInMonths = Math.floor(diffInDays / 30);
+    if (diffInMonths < 12) {
+      return `Hace ${diffInMonths} ${diffInMonths === 1 ? 'mes' : 'meses'}`;
+    }
+    
+    const diffInYears = Math.floor(diffInMonths / 12);
+    return `Hace ${diffInYears} ${diffInYears === 1 ? 'año' : 'años'}`;
+  }
+  
+  function setupPostButtons(postElement: HTMLElement, post: any): void {
+    // Configurar botón de like
+    const likeBtn = postElement.querySelector('.like-btn');
+    if (likeBtn) {
+      likeBtn.addEventListener('click', () => handleLike(post._id));
+    }
+    
+    // Configurar botón de comentario
+    const commentBtn = postElement.querySelector('.comment-btn');
+    if (commentBtn) {
+      commentBtn.addEventListener('click', () => openCommentModal(post));
+    }
+  }
+  
+  async function handleLike(postId: string): Promise<void> {
+    try {
+      // @ts-ignore
+      await window.posts.like(postId);
+      // Recargar posts para mostrar el nuevo estado
+      loadPosts();
+    } catch (error) {
+      console.error('Error al dar like:', error);
+    }
+  }
+  
+  function openCommentModal(post: any): void {
+    selectedPostId = post._id;
+    
+    const commentModal = document.getElementById('commentModal');
+    if (!commentModal) return;
+    
+    // Configurar datos del post en el modal
+    const authorName = commentModal.querySelector('#commentModalAuthorName');
+    const authorImg = commentModal.querySelector('#commentModalAuthorImg') as HTMLImageElement;
+    const authorInitials = commentModal.querySelector('#commentModalAuthorInitials') as HTMLElement;
+    const modalDate = commentModal.querySelector('#commentModalDate');
+    const modalContent = commentModal.querySelector('#commentModalContent');
+    const modalImage = commentModal.querySelector('#commentModalImage') as HTMLImageElement;
+    const modalImageContainer = commentModal.querySelector('#commentModalImageContainer');
+    
+    if (authorName) authorName.textContent = post.user.name;
+    
+    if (authorImg && authorInitials) {
+      if (post.user.profilePicture) {
+        authorImg.src = post.user.profilePicture;
+        authorImg.style.display = 'block';
+        authorInitials.style.display = 'none';
       } else {
-        commentModalAuthorImg.classList.add('hidden');
-        commentModalAuthorInitials.textContent = getInitials(post.user.name);
-        commentModalAuthorInitials.classList.remove('hidden');
+        authorImg.style.display = 'none';
+        authorInitials.style.display = 'flex';
+        
+        // Generar iniciales
+        const nameParts = post.user.name.split(' ');
+        let initials = nameParts[0][0];
+        if (nameParts.length > 1) {
+          initials += nameParts[1][0];
+        }
+        authorInitials.textContent = initials.toUpperCase();
       }
     }
     
-    // Gestionar la imagen del post
-    if (commentModalImage && commentModalImageContainer) {
+    if (modalDate) modalDate.textContent = formatRelativeTime(new Date(post.createdAt));
+    if (modalContent) modalContent.textContent = post.content;
+    
+    // Mostrar imagen si existe
+    if (modalImage && modalImageContainer) {
       if (post.image) {
-        commentModalImage.src = `http://localhost:5000${post.image}`;
-        commentModalImageContainer.classList.remove('hidden');
+        modalImage.src = post.image;
+        modalImageContainer.classList.remove('hidden');
       } else {
-        commentModalImageContainer.classList.add('hidden');
+        modalImageContainer.classList.add('hidden');
       }
     }
+    
+    // Configurar el botón de enviar comentario
+    setupCommentForm();
     
     // Cargar comentarios
-    loadComments(post._id);
+    loadComments();
     
     // Mostrar el modal
     commentModal.classList.remove('hidden');
   }
   
-  // Cargar comentarios de un post
-  async function loadComments(postId: string) {
-    if (!commentsList || !commentsLoading || !noCommentsMessage) return;
+  // Configurar formulario de comentarios
+  function setupCommentForm(): void {
+    const submitCommentBtn = document.getElementById('submitCommentBtn');
+    const commentInput = document.getElementById('commentInput') as HTMLInputElement;
+    const commentSubmitLoading = document.getElementById('commentSubmitLoading');
+    const commentModal = document.getElementById('commentModal');
+    const closeCommentModal = document.getElementById('closeCommentModal');
+    
+    if (!submitCommentBtn || !commentInput || !commentSubmitLoading || !commentModal || !closeCommentModal) {
+      console.error('Elementos del formulario de comentarios no encontrados');
+      return;
+    }
+    
+    // Limpiar el formulario
+    commentInput.value = '';
+    
+    // Eliminar eventos anteriores para evitar duplicados
+    const newSubmitBtn = submitCommentBtn.cloneNode(true);
+    submitCommentBtn.parentNode?.replaceChild(newSubmitBtn, submitCommentBtn);
+    
+    const newCloseBtn = closeCommentModal.cloneNode(true);
+    closeCommentModal.parentNode?.replaceChild(newCloseBtn, closeCommentModal);
+    
+    // Configurar nuevo evento de envío
+    newSubmitBtn.addEventListener('click', submitComment);
+    
+    // Configurar evento de tecla Enter
+    commentInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        submitComment();
+      }
+    });
+    
+    // Configurar cerrar modal
+    newCloseBtn.addEventListener('click', () => {
+      commentModal.classList.add('hidden');
+    });
+  }
+  
+  // Enviar un comentario
+  async function submitComment(): Promise<void> {
+    if (!selectedPostId) return;
+    
+    const commentInput = document.getElementById('commentInput') as HTMLInputElement;
+    const commentSubmitLoading = document.getElementById('commentSubmitLoading');
+    const submitCommentBtn = document.getElementById('submitCommentBtn');
+    
+    if (!commentInput || !commentSubmitLoading || !submitCommentBtn) return;
+    
+    const content = commentInput.value.trim();
+    if (!content) {
+      alert('El comentario no puede estar vacío');
+      return;
+    }
     
     try {
-      // Mostrar indicador de carga
-      commentsLoading.classList.remove('hidden');
-      noCommentsMessage.classList.add('hidden');
-      commentsList.innerHTML = '';
+      // Mostrar cargando y deshabilitar botón
+      commentSubmitLoading.classList.remove('hidden');
+      submitCommentBtn.setAttribute('disabled', 'true');
+      commentInput.setAttribute('disabled', 'true');
       
-      // Obtener comentarios
-      const postComments = await posts.getComments(postId);
+      console.log(`Enviando comentario al post ${selectedPostId}: "${content}"`);
       
-      // Ocultar indicador de carga
+      // Verificar que la API de posts esté disponible
+      if (!(window as any).posts || !(window as any).posts.comment) {
+        throw new Error("La API de comentarios no está disponible");
+      }
+      
+      // Enviar comentario
+      await (window as any).posts.comment(selectedPostId, content);
+      
+      // Limpiar el formulario
+      commentInput.value = '';
+      
+      // Recargar comentarios para mostrar el nuevo
+      loadComments();
+    } catch (error) {
+      console.error('Error al enviar comentario:', error);
+      alert('Error al enviar el comentario. Intenta nuevamente.');
+    } finally {
+      // Ocultar cargando y habilitar botón
+      commentSubmitLoading.classList.add('hidden');
+      submitCommentBtn.removeAttribute('disabled');
+      commentInput.removeAttribute('disabled');
+    }
+  }
+  
+  async function loadComments(): Promise<void> {
+    if (!selectedPostId) return;
+    
+    const commentsList = document.getElementById('commentsList');
+    const commentsLoading = document.getElementById('commentsLoading');
+    const noCommentsMessage = document.getElementById('noCommentsMessage');
+    
+    if (!commentsList || !commentsLoading || !noCommentsMessage) return;
+    
+    // Mostrar cargando
+    commentsLoading.classList.remove('hidden');
+    noCommentsMessage.classList.add('hidden');
+    
+    // Limpiar comentarios existentes excepto los elementos de estado
+    const children = Array.from(commentsList.children);
+    children.forEach(child => {
+      if (child !== commentsLoading && child !== noCommentsMessage) {
+        child.remove();
+      }
+    });
+    
+    try {
+      console.log(`Intentando cargar comentarios para el post: ${selectedPostId}`);
+      
+      // Verificar que la API de posts esté disponible
+      if (!(window as any).posts || !(window as any).posts.getComments) {
+        throw new Error("La API de comentarios no está disponible");
+      }
+      
+      const comments = await (window as any).posts.getComments(selectedPostId);
+      console.log('Comentarios recibidos:', comments);
+      
+      // Ocultar cargando
       commentsLoading.classList.add('hidden');
       
-      // Si no hay comentarios, mostrar mensaje
-      if (!postComments || postComments.length === 0) {
+      // Mostrar mensaje si no hay comentarios
+      if (!comments || comments.length === 0) {
         noCommentsMessage.classList.remove('hidden');
         return;
       }
       
-      // Renderizar cada comentario
-      postComments.forEach((comment: Comment) => {
-        const relativeTime = formatRelativeTime(comment.createdAt);
-        
-        // Asegurarnos de que la URL de la imagen de perfil sea completa
-        let profileImageUrl = comment.user.profilePicture || '/images/avatar-placeholder.png';
-        if (profileImageUrl && profileImageUrl.startsWith('/uploads/')) {
-          profileImageUrl = `http://localhost:5000${profileImageUrl}`;
+      // Mostrar comentarios recibidos
+      comments.forEach((comment: {
+        user: {
+          profilePicture?: string;
+          name: string;
+        };
+        content: string;
+        createdAt: string;
+      }) => {
+        // Validar que el comentario tiene la estructura esperada
+        if (!comment || !comment.user) {
+          console.error('Comentario con formato inválido:', comment);
+          return;
         }
         
         const commentElement = document.createElement('div');
-        commentElement.className = 'flex items-start space-x-3';
+        commentElement.className = 'flex space-x-2 animate-fadeIn';
+        
+        // Asegurar que se muestran correctamente los caracteres especiales
+        const userName = comment.user.name || 'Usuario';
+        const content = comment.content || 'Sin contenido';
+        
         commentElement.innerHTML = `
           <div class="relative h-8 w-8 rounded-full overflow-hidden flex-shrink-0">
-            <img src="${profileImageUrl}" alt="${comment.user.name}" class="h-full w-full object-cover ${comment.user.profilePicture ? '' : 'hidden'}">
-            <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-purple-500 to-indigo-600 text-white font-bold text-xs ${comment.user.profilePicture ? 'hidden' : ''}">
-              ${getInitials(comment.user.name)}
-            </div>
+            <img src="${comment.user.profilePicture || '/images/avatar-placeholder.png'}" alt="${userName}" class="h-full w-full object-cover">
           </div>
-          <div class="flex-1 bg-purple-50 rounded-lg px-4 py-2">
-            <div class="flex justify-between items-center">
-              <p class="font-medium text-purple-900">${comment.user.name}</p>
-              <p class="text-xs text-gray-500">${relativeTime}</p>
-            </div>
-            <p class="text-gray-800 mt-1">${comment.content}</p>
+          <div class="flex-1 bg-gray-100 p-2 rounded-lg">
+            <p class="text-xs font-semibold">${userName}</p>
+            <p class="text-sm">${content}</p>
+            <p class="text-xs text-gray-500 mt-1">${formatRelativeTime(new Date(comment.createdAt))}</p>
           </div>
         `;
         
@@ -776,115 +1207,20 @@ import LoadingTransition from '../components/LoadingTransition.astro';
       });
     } catch (error) {
       console.error('Error al cargar comentarios:', error);
-      
-      // Ocultar indicador de carga
       commentsLoading.classList.add('hidden');
       
       // Mostrar mensaje de error
-      commentsList.innerHTML = `
-        <div class="text-center py-3">
-          <p class="text-red-500">No se pudieron cargar los comentarios. Por favor, inténtalo de nuevo más tarde.</p>
-        </div>
-      `;
-    }
-  }
-  
-  // Actualizar todas las imágenes del usuario en la página
-  function updateUserImages() {
-    const userProfileImages = document.querySelectorAll('.user-profile-image') as NodeListOf<HTMLImageElement>;
-    const userInitials = document.querySelectorAll('.user-initials');
-    
-    if (currentUser && currentUser.profilePicture) {
-      // Mostrar la imagen de perfil en todos los lugares
-      userProfileImages.forEach(img => {
-        img.src = currentUser.profilePicture;
-        img.classList.remove('hidden');
-      });
+      const errorElement = document.createElement('div');
+      errorElement.className = 'text-center text-red-500 py-3';
+      errorElement.textContent = 'Error al cargar los comentarios. Intenta nuevamente.';
+      commentsList.appendChild(errorElement);
       
-      // Ocultar las iniciales
-      userInitials.forEach(div => {
-        div.classList.add('hidden');
-      });
-    } else {
-      // Ocultar las imágenes
-      userProfileImages.forEach(img => {
-        img.classList.add('hidden');
-      });
-      
-      // Mostrar las iniciales
-      const initials = currentUser ? getInitials(currentUser.name) : 'TM';
-      userInitials.forEach(div => {
-        div.textContent = initials;
-        div.classList.remove('hidden');
-      });
+      // Añadir botón para intentar de nuevo
+      const retryButton = document.createElement('button');
+      retryButton.className = 'mx-auto block mt-2 bg-purple-100 hover:bg-purple-200 text-purple-700 font-semibold py-1 px-4 rounded-lg text-sm transition-colors';
+      retryButton.textContent = 'Intentar nuevamente';
+      retryButton.onclick = () => loadComments();
+      commentsList.appendChild(retryButton);
     }
-  }
-
-  // Obtener iniciales a partir de un nombre
-  function getInitials(name: string): string {
-    if (!name) return 'TM';
-    
-    const parts = name.split(' ');
-    if (parts.length === 1) {
-      return name.substring(0, 2).toUpperCase();
-    }
-    
-    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-  }
-
-  // Formatear fecha relativa (ej: "hace 5 minutos")
-  function formatRelativeTime(dateString: string): string {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffSec = Math.round(diffMs / 1000);
-    const diffMin = Math.round(diffSec / 60);
-    const diffHour = Math.round(diffMin / 60);
-    const diffDay = Math.round(diffHour / 24);
-    
-    if (diffSec < 60) {
-      return 'Justo ahora';
-    } else if (diffMin < 60) {
-      return `Hace ${diffMin} ${diffMin === 1 ? 'minuto' : 'minutos'}`;
-    } else if (diffHour < 24) {
-      return `Hace ${diffHour} ${diffHour === 1 ? 'hora' : 'horas'}`;
-    } else if (diffDay < 30) {
-      return `Hace ${diffDay} ${diffDay === 1 ? 'día' : 'días'}`;
-    } else {
-      // Para fechas más antiguas, mostrar la fecha completa
-      return date.toLocaleDateString();
-    }
-  }
-
-  // Control de logout
-  if (logoutBtn) {
-    logoutBtn.addEventListener('click', () => {
-      auth.logout();
-      window.location.href = '/';
-    });
-  }
-
-  // Resto del script existente para modales, posts, etc.
-  // ...
-
-  // Inicializar la página
-  loadCurrentUser();
-  loadPosts();
-  
-  // Manejar cambio entre mostrar todos los posts o solo de amigos
-  if (toggleFriendMode) {
-    toggleFriendMode.addEventListener('click', () => {
-      showFriendsPostsOnly = !showFriendsPostsOnly;
-      toggleFriendMode.textContent = showFriendsPostsOnly ? 'Ver todas las publicaciones' : 'Ver publicaciones de amigos';
-      loadPosts();
-    });
-  }
-  
-  if (mobileToggleFriendMode) {
-    mobileToggleFriendMode.addEventListener('click', () => {
-      showFriendsPostsOnly = !showFriendsPostsOnly;
-      mobileToggleFriendMode.textContent = showFriendsPostsOnly ? 'Ver todas las publicaciones' : 'Ver publicaciones de amigos';
-      loadPosts();
-    });
   }
 </script> 
