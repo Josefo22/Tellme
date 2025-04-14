@@ -475,6 +475,34 @@ import LoadingTransition from '../components/LoadingTransition.astro';
   let pendingRequests: any[] = [];
   let imageBase64: string | null = null;
   
+  // Definir interfaces para post y comentario
+  interface User {
+    _id: string;
+    name: string;
+    email: string;
+    profilePicture?: string;
+  }
+  
+  interface Post {
+    _id: string;
+    content: string;
+    user: User;
+    createdAt: string;
+    updatedAt: string;
+    likes: string[];
+    comments: string[];
+    image?: string;
+  }
+  
+  interface Comment {
+    _id: string;
+    content: string;
+    user: User;
+    post: string;
+    createdAt: string;
+    updatedAt: string;
+  }
+  
   // Actualizar los indicadores de solicitudes de amistad tanto en móvil como en escritorio
   function updateRequestIndicators(count: number) {
     if (requestIndicator && mobileRequestIndicator) {
@@ -506,6 +534,258 @@ import LoadingTransition from '../components/LoadingTransition.astro';
       
     } catch (error) {
       console.error('Error al cargar datos del usuario:', error);
+    }
+  }
+  
+  // Cargar las publicaciones
+  async function loadPosts() {
+    if (!postsContainer || !loadingPosts) return;
+    
+    try {
+      // Mostrar indicador de carga
+      loadingPosts.classList.remove('hidden');
+      
+      // Obtener los posts
+      const allPosts = await posts.getAll(showFriendsPostsOnly);
+      
+      // Ocultar indicador de carga
+      loadingPosts.classList.add('hidden');
+      
+      // Limpiar el contenedor antes de añadir nuevos posts
+      postsContainer.innerHTML = '';
+      
+      // Si no hay posts, mostrar mensaje
+      if (!allPosts || allPosts.length === 0) {
+        const noPostsElement = document.createElement('div');
+        noPostsElement.className = 'text-center py-8 bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-purple-100';
+        noPostsElement.innerHTML = `
+          <p class="text-purple-600">No hay publicaciones para mostrar</p>
+          <p class="text-gray-500 text-sm mt-2">Sé el primero en compartir algo</p>
+        `;
+        postsContainer.appendChild(noPostsElement);
+        return;
+      }
+      
+      // Renderizar cada post
+      allPosts.forEach((post: Post) => {
+        // Formatear fecha relativa
+        const relativeTime = formatRelativeTime(post.createdAt);
+        
+        // Asegurarnos de que la URL de la imagen de perfil sea completa
+        let profileImageUrl = post.user.profilePicture || '/images/avatar-placeholder.png';
+        if (profileImageUrl && profileImageUrl.startsWith('/uploads/')) {
+          profileImageUrl = `http://localhost:5000${profileImageUrl}`;
+        }
+        
+        // Crear elemento del post
+        const postElement = document.createElement('div');
+        postElement.className = 'bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-purple-100 overflow-hidden';
+        postElement.innerHTML = `
+          <div class="p-4">
+            <div class="flex items-start space-x-3">
+              <div class="relative h-10 w-10 rounded-full overflow-hidden flex-shrink-0">
+                <img src="${profileImageUrl}" alt="${post.user.name}" class="h-full w-full object-cover">
+                <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-purple-500 to-indigo-600 text-white font-bold ${post.user.profilePicture ? 'hidden' : ''}">
+                  ${getInitials(post.user.name)}
+                </div>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="font-medium text-purple-900">${post.user.name}</p>
+                <p class="text-xs text-gray-500">${relativeTime}</p>
+              </div>
+            </div>
+            <div class="mt-3">
+              <p class="text-gray-800 whitespace-pre-line">${post.content}</p>
+            </div>
+            ${post.image ? `
+              <div class="mt-3">
+                <img src="http://localhost:5000${post.image}" alt="Imagen de la publicación" class="w-full h-auto rounded-lg">
+              </div>
+            ` : ''}
+          </div>
+          <div class="flex border-t border-purple-100">
+            <button class="flex-1 py-2 hover:bg-purple-50 transition-colors flex items-center justify-center gap-1 like-button" data-post-id="${post._id}">
+              <svg class="h-5 w-5 ${post.likes.includes(currentUser?._id) ? 'text-red-500 fill-red-500' : 'text-gray-500'}" 
+                ${post.likes.includes(currentUser?._id) ? 'fill="currentColor"' : 'fill="none"'} stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+              </svg>
+              <span class="text-sm">${post.likes.length} Me gusta</span>
+            </button>
+            <button class="flex-1 py-2 hover:bg-purple-50 transition-colors flex items-center justify-center gap-1 comment-button" data-post-id="${post._id}">
+              <svg class="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              </svg>
+              <span class="text-sm">${post.comments.length} Comentarios</span>
+            </button>
+          </div>
+        `;
+        
+        // Añadir el post al contenedor
+        postsContainer.appendChild(postElement);
+        
+        // Añadir event listeners a los botones
+        const likeButton = postElement.querySelector('.like-button');
+        const commentButton = postElement.querySelector('.comment-button');
+        
+        if (likeButton) {
+          likeButton.addEventListener('click', () => {
+            handleLikePost(post._id);
+          });
+        }
+        
+        if (commentButton) {
+          commentButton.addEventListener('click', () => {
+            openComments(post);
+          });
+        }
+      });
+    } catch (error) {
+      console.error('Error al cargar publicaciones:', error);
+      
+      // Mostrar mensaje de error
+      loadingPosts.classList.add('hidden');
+      
+      const errorElement = document.createElement('div');
+      errorElement.className = 'text-center py-8 bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-purple-100';
+      errorElement.innerHTML = `
+        <svg class="h-12 w-12 text-red-500 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+        <p class="text-red-600">No se pudieron cargar las publicaciones</p>
+        <p class="text-gray-500 text-sm mt-2">Por favor, inténtalo de nuevo más tarde</p>
+        <button id="retryLoadPosts" class="mt-4 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">Reintentar</button>
+      `;
+      postsContainer.appendChild(errorElement);
+      
+      // Añadir event listener al botón de reintentar
+      const retryButton = errorElement.querySelector('#retryLoadPosts');
+      if (retryButton) {
+        retryButton.addEventListener('click', loadPosts);
+      }
+    }
+  }
+  
+  // Manejar dar me gusta a un post
+  async function handleLikePost(postId: string) {
+    try {
+      await posts.likePost(postId);
+      // Recargar los posts para mostrar el estado actualizado
+      loadPosts();
+    } catch (error) {
+      console.error('Error al dar me gusta:', error);
+    }
+  }
+  
+  // Abrir modal de comentarios
+  function openComments(post: Post) {
+    if (!commentModal || !commentModalAuthorName || !commentModalContent || !commentModalDate) return;
+    
+    selectedPostId = post._id;
+    
+    // Establecer datos del post en el modal
+    commentModalAuthorName.textContent = post.user.name;
+    commentModalContent.textContent = post.content;
+    commentModalDate.textContent = formatRelativeTime(post.createdAt);
+    
+    // Gestionar la imagen de perfil del autor
+    if (commentModalAuthorImg && commentModalAuthorInitials) {
+      if (post.user.profilePicture) {
+        let profileImageUrl = post.user.profilePicture;
+        if (profileImageUrl.startsWith('/uploads/')) {
+          profileImageUrl = `http://localhost:5000${profileImageUrl}`;
+        }
+        
+        commentModalAuthorImg.src = profileImageUrl;
+        commentModalAuthorImg.classList.remove('hidden');
+        commentModalAuthorInitials.classList.add('hidden');
+      } else {
+        commentModalAuthorImg.classList.add('hidden');
+        commentModalAuthorInitials.textContent = getInitials(post.user.name);
+        commentModalAuthorInitials.classList.remove('hidden');
+      }
+    }
+    
+    // Gestionar la imagen del post
+    if (commentModalImage && commentModalImageContainer) {
+      if (post.image) {
+        commentModalImage.src = `http://localhost:5000${post.image}`;
+        commentModalImageContainer.classList.remove('hidden');
+      } else {
+        commentModalImageContainer.classList.add('hidden');
+      }
+    }
+    
+    // Cargar comentarios
+    loadComments(post._id);
+    
+    // Mostrar el modal
+    commentModal.classList.remove('hidden');
+  }
+  
+  // Cargar comentarios de un post
+  async function loadComments(postId: string) {
+    if (!commentsList || !commentsLoading || !noCommentsMessage) return;
+    
+    try {
+      // Mostrar indicador de carga
+      commentsLoading.classList.remove('hidden');
+      noCommentsMessage.classList.add('hidden');
+      commentsList.innerHTML = '';
+      
+      // Obtener comentarios
+      const postComments = await posts.getComments(postId);
+      
+      // Ocultar indicador de carga
+      commentsLoading.classList.add('hidden');
+      
+      // Si no hay comentarios, mostrar mensaje
+      if (!postComments || postComments.length === 0) {
+        noCommentsMessage.classList.remove('hidden');
+        return;
+      }
+      
+      // Renderizar cada comentario
+      postComments.forEach((comment: Comment) => {
+        const relativeTime = formatRelativeTime(comment.createdAt);
+        
+        // Asegurarnos de que la URL de la imagen de perfil sea completa
+        let profileImageUrl = comment.user.profilePicture || '/images/avatar-placeholder.png';
+        if (profileImageUrl && profileImageUrl.startsWith('/uploads/')) {
+          profileImageUrl = `http://localhost:5000${profileImageUrl}`;
+        }
+        
+        const commentElement = document.createElement('div');
+        commentElement.className = 'flex items-start space-x-3';
+        commentElement.innerHTML = `
+          <div class="relative h-8 w-8 rounded-full overflow-hidden flex-shrink-0">
+            <img src="${profileImageUrl}" alt="${comment.user.name}" class="h-full w-full object-cover ${comment.user.profilePicture ? '' : 'hidden'}">
+            <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-purple-500 to-indigo-600 text-white font-bold text-xs ${comment.user.profilePicture ? 'hidden' : ''}">
+              ${getInitials(comment.user.name)}
+            </div>
+          </div>
+          <div class="flex-1 bg-purple-50 rounded-lg px-4 py-2">
+            <div class="flex justify-between items-center">
+              <p class="font-medium text-purple-900">${comment.user.name}</p>
+              <p class="text-xs text-gray-500">${relativeTime}</p>
+            </div>
+            <p class="text-gray-800 mt-1">${comment.content}</p>
+          </div>
+        `;
+        
+        commentsList.appendChild(commentElement);
+      });
+    } catch (error) {
+      console.error('Error al cargar comentarios:', error);
+      
+      // Ocultar indicador de carga
+      commentsLoading.classList.add('hidden');
+      
+      // Mostrar mensaje de error
+      commentsList.innerHTML = `
+        <div class="text-center py-3">
+          <p class="text-red-500">No se pudieron cargar los comentarios. Por favor, inténtalo de nuevo más tarde.</p>
+        </div>
+      `;
     }
   }
   
@@ -586,4 +866,25 @@ import LoadingTransition from '../components/LoadingTransition.astro';
 
   // Resto del script existente para modales, posts, etc.
   // ...
+
+  // Inicializar la página
+  loadCurrentUser();
+  loadPosts();
+  
+  // Manejar cambio entre mostrar todos los posts o solo de amigos
+  if (toggleFriendMode) {
+    toggleFriendMode.addEventListener('click', () => {
+      showFriendsPostsOnly = !showFriendsPostsOnly;
+      toggleFriendMode.textContent = showFriendsPostsOnly ? 'Ver todas las publicaciones' : 'Ver publicaciones de amigos';
+      loadPosts();
+    });
+  }
+  
+  if (mobileToggleFriendMode) {
+    mobileToggleFriendMode.addEventListener('click', () => {
+      showFriendsPostsOnly = !showFriendsPostsOnly;
+      mobileToggleFriendMode.textContent = showFriendsPostsOnly ? 'Ver todas las publicaciones' : 'Ver publicaciones de amigos';
+      loadPosts();
+    });
+  }
 </script> 
