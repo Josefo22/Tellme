@@ -142,19 +142,23 @@ import LoadingTransition from '../components/LoadingTransition.astro';
         </div>
 
         <!-- Profile Stats -->
-        <div class="grid grid-cols-3 gap-4 mb-6">
-          <div class="bg-white/80 backdrop-blur-sm p-4 rounded-xl shadow-lg border border-white/20 text-center">
-            <p class="text-2xl font-bold text-purple-600" id="postsCount">0</p>
-            <p class="text-sm text-gray-600">Publicaciones</p>
+        <div class="bg-white/80 backdrop-blur-sm p-4 rounded-xl shadow-lg border border-white/20 mb-6">
+          <h3 class="text-lg font-semibold text-gray-800 mb-3 border-b border-gray-100 pb-2">Estadisticas del Perfil</h3>
+          <div class="grid grid-cols-3 gap-6">
+            <div class="text-center p-3 hover:bg-purple-50 rounded-lg transition-all cursor-pointer">
+              <p class="text-3xl font-bold text-purple-600" id="postsCount">0</p>
+              <p class="text-sm text-gray-600 font-medium">Publicaciones</p>
+            </div>
+            <div class="text-center p-3 hover:bg-purple-50 rounded-lg transition-all cursor-pointer">
+              <p class="text-3xl font-bold text-purple-600" id="likesCount">0</p>
+              <p class="text-sm text-gray-600 font-medium">Me gusta</p>
+            </div>
+            <div class="text-center p-3 hover:bg-purple-50 rounded-lg transition-all cursor-pointer">
+              <p class="text-3xl font-bold text-purple-600" id="commentsCount">0</p>
+              <p class="text-sm text-gray-600 font-medium">Comentarios</p>
+            </div>
           </div>
-          <div class="bg-white/80 backdrop-blur-sm p-4 rounded-xl shadow-lg border border-white/20 text-center">
-            <p class="text-2xl font-bold text-purple-600" id="likesCount">0</p>
-            <p class="text-sm text-gray-600">Me gusta</p>
-          </div>
-          <div class="bg-white/80 backdrop-blur-sm p-4 rounded-xl shadow-lg border border-white/20 text-center">
-            <p class="text-2xl font-bold text-purple-600" id="commentsCount">0</p>
-            <p class="text-sm text-gray-600">Comentarios</p>
-          </div>
+          <div id="statsError" class="hidden mt-2 text-center text-sm text-red-500"></div>
         </div>
 
         <!-- Timeline al estilo Facebook -->
@@ -574,12 +578,26 @@ import LoadingTransition from '../components/LoadingTransition.astro';
 
   // Cargar estadísticas del usuario
   const loadUserStats = async () => {
+    const statsError = document.getElementById('statsError');
+    
     try {
       console.log('Cargando estadísticas del usuario...');
+      // Mostrar indicadores de carga mientras se obtienen los datos
+      if (postsCount) postsCount.textContent = '...';
+      if (likesCount) likesCount.textContent = '...';
+      if (commentsCount) commentsCount.textContent = '...';
+      
+      // Ocultar cualquier mensaje de error previo
+      if (statsError) {
+        statsError.textContent = '';
+        statsError.classList.add('hidden');
+      }
+      
       // Usar la función de la API para obtener las estadísticas
       const stats = await posts.getUserStats();
       console.log('Estadísticas cargadas:', stats);
       
+      // Actualizar el UI con los datos recibidos
       if (postsCount) postsCount.textContent = stats.posts.toString();
       if (likesCount) likesCount.textContent = stats.likes.toString();
       if (commentsCount) commentsCount.textContent = stats.comments.toString();
@@ -588,9 +606,15 @@ import LoadingTransition from '../components/LoadingTransition.astro';
       
       // Usar datos de ejemplo cuando hay error
       console.log('Usando datos de ejemplo para las estadísticas');
-      if (postsCount) postsCount.textContent = '5';
-      if (likesCount) likesCount.textContent = '12';
-      if (commentsCount) commentsCount.textContent = '8';
+      if (postsCount) postsCount.textContent = '0';
+      if (likesCount) likesCount.textContent = '0';
+      if (commentsCount) commentsCount.textContent = '0';
+      
+      // Mostrar mensaje de error al usuario en el elemento dedicado
+      if (statsError) {
+        statsError.textContent = 'No se pudieron cargar las estadísticas. Intenta de nuevo más tarde.';
+        statsError.classList.remove('hidden');
+      }
     }
   };
 
@@ -752,7 +776,20 @@ import LoadingTransition from '../components/LoadingTransition.astro';
 
   // Cargar datos al iniciar
   console.log('Iniciando carga de datos...');
-  loadUserData();
-  loadUserStats();
-  loadUserPosts();
+  
+  // Función principal de inicialización
+  const initializeProfile = async () => {
+    try {
+      // Primero cargamos los datos del usuario
+      await loadUserData();
+      // Luego cargamos las estadísticas y posts
+      await loadUserStats();
+      await loadUserPosts();
+    } catch (error) {
+      console.error('Error durante la inicialización del perfil:', error);
+    }
+  };
+
+  // Iniciar carga de datos
+  initializeProfile();
 </script> 

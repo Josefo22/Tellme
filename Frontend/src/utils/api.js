@@ -80,14 +80,7 @@ const getAuthHeaders = () => {
 const apiRequest = async (endpoint, options = {}) => {
   // Endpoints que sabemos que no están disponibles aún (para evitar errores en consola)
   const endpointsNoDisponibles = [
-    '/friends',
-    '/friends/requests',
-    '/friends/accept/',
-    '/friends/reject/',
-    '/friends/request/',
     '/friends/suggestions',
-    '/users/search',
-    '/users',            // Agregamos /users a la lista de endpoints no disponibles
     '/posts/friends'     // Agregamos /posts/friends a la lista de endpoints no disponibles
     // Quitamos '/users' para permitir obtener los usuarios reales
   ];
@@ -299,9 +292,22 @@ export const posts = {
   
   // Obtener estadísticas del usuario
   getUserStats: async () => {
-    return apiRequest('/users/me/stats', {
-      method: 'GET'
-    });
+    try {
+      return await apiRequest('/users/me/stats', {
+        method: 'GET'
+      });
+    } catch (error) {
+      if (DEBUG_MODE) {
+        console.warn('Endpoint de estadísticas de usuario no disponible, usando datos de ejemplo:', error);
+      }
+      
+      // Si el endpoint falla, devolver datos de ejemplo
+      return {
+        posts: 0,
+        likes: 0,
+        comments: 0
+      };
+    }
   }
 };
 
@@ -411,11 +417,11 @@ export const users = {
             try {
               // Enviar la imagen como JSON
               const response = await fetch(`${API_URL}/users/me/avatar-base64`, {
-      method: 'POST',
-      headers: {
+                method: 'POST',
+                headers: {
                   'Content-Type': 'application/json',
-        'Authorization': `Bearer ${getToken()}`
-      },
+                  'Authorization': `Bearer ${getToken()}`
+                },
                 body: JSON.stringify({ imageBase64 })
               });
               
@@ -435,31 +441,25 @@ export const users = {
                 console.error('Respuesta no JSON:', text);
                 throw new Error('El servidor no devolvió datos JSON válidos');
               }
-            } catch (fetchError) {
-              console.error('Error en la petición al servidor:', fetchError);
-              
-              // Si es un error de conexión, proporcionar un mensaje más amigable
-              if (fetchError instanceof TypeError && fetchError.message.includes('NetworkError')) {
-                reject(new Error('No se pudo conectar con el servidor. Verifica tu conexión a internet.'));
-              } else {
-                reject(fetchError);
-              }
+            } catch (error) {
+              console.error('Error en la petición fetch:', error);
+              reject(error);
             }
           } catch (error) {
-            console.error('Error en el proceso de carga:', error);
+            console.error('Error al procesar la imagen:', error);
             reject(error);
           }
         };
         
-        reader.onerror = (event) => {
-          console.error('Error al leer el archivo:', event);
+        reader.onerror = () => {
           reject(new Error('Error al leer el archivo de imagen'));
         };
         
         reader.readAsDataURL(imageFile);
       });
+      
     } catch (error) {
-      console.error('Error al preparar la imagen para subir:', error);
+      console.error('Error al subir foto de perfil:', error);
       throw error;
     }
   }
@@ -978,7 +978,9 @@ export const friends = {
   searchUsers: async function(query) {
     try {
       // Intentar usar el endpoint de búsqueda específico
-      return await apiRequest(`/users/search?q=${encodeURIComponent(query)}`, {
+      const encodedQuery = encodeURIComponent(query.trim());
+      
+      return await apiRequest(`/users/search?q=${encodedQuery}`, {
         method: 'GET'
       });
     } catch (error) {
@@ -990,15 +992,20 @@ export const friends = {
         // Si no hay endpoint de búsqueda, obtener todos los usuarios usando la función getAll
         const allUsers = await users.getAll();
         
-        // Si no hay consulta, devolver todos los usuarios
+        // Obtener el ID del usuario actual para excluirlo de los resultados
+        const currentUserId = getCurrentUserId();
+        
+        // Si no hay consulta, devolver todos los usuarios excepto el actual
         if (!query) {
-          return allUsers;
+          return allUsers.filter(user => user._id !== currentUserId);
         }
         
         // Filtrar los usuarios por nombre (case insensitive)
-        const lowerQuery = query.toLowerCase();
+        const lowerQuery = query.toLowerCase().trim();
         return allUsers.filter(user => 
-          user.name && user.name.toLowerCase().includes(lowerQuery)
+          user._id !== currentUserId && 
+          user.name && 
+          user.name.toLowerCase().includes(lowerQuery)
         );
       } catch (userError) {
         if (DEBUG_MODE) {
@@ -1044,13 +1051,18 @@ export const friends = {
           }
         ];
         
-        // Si no hay consulta o filtrado como antes
+        // Obtener el ID del usuario actual para excluirlo
+        const currentUserId = getCurrentUserId();
+        
+        // Si no hay consulta, devolver todos los usuarios de ejemplo excepto el actual
         if (!query) {
-          return exampleUsers;
+          return exampleUsers.filter(user => user._id !== currentUserId);
         }
         
-        const lowerQuery = query.toLowerCase();
+        // Filtrar por nombre
+        const lowerQuery = query.toLowerCase().trim();
         return exampleUsers.filter(user => 
+          user._id !== currentUserId &&
           user.name.toLowerCase().includes(lowerQuery)
         );
       }
