@@ -5,7 +5,8 @@ const getApiUrl = () => {
   
   if (isProduction) {
     // URL para producción - usar la variable de entorno pública de Astro
-    const apiUrl = import.meta.env.PUBLIC_API_URL || 'https://app-pro-backend.onrender.com/api';
+    const apiUrl = import.meta.env.PUBLIC_API_URL || 'https://app-pro-backend.onrender.com';
+    console.log('API URL en producción:', apiUrl);
     // Asegurarse de que no hay barra final duplicada
     return apiUrl.endsWith('/') ? apiUrl.slice(0, -1) : apiUrl;
   } else {
@@ -16,8 +17,8 @@ const getApiUrl = () => {
 
 const API_URL = getApiUrl();
 
-// Modo de depuración - desactivamos para producción o para reducir los logs
-const DEBUG_MODE = false; // Cambiamos a false para evitar tantos mensajes en consola
+// Modo de depuración - activamos para diagnóstico
+const DEBUG_MODE = true; // Activamos para diagnosticar el problema
 
 // Función para manejar las respuestas de la API
 const handleResponse = async (response) => {
@@ -100,20 +101,23 @@ const apiRequest = async (endpoint, options = {}) => {
   const esEndpointNoDisponible = endpointsNoDisponibles.some(e => endpoint.startsWith(e));
   
   try {
-    if (DEBUG_MODE && !esEndpointNoDisponible) {
-      console.log(`Haciendo petición a: ${API_URL}${endpoint}`, options);
-    }
+    // Asegurar que endpoint comienza con / (si no lo tiene)
+    const normalizedEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+    
+    // Construir URL completa asegurando que tenga /api en la ruta
+    const apiPath = API_URL.includes('/api') ? '' : '/api';
+    const fullUrl = `${API_URL}${apiPath}${normalizedEndpoint}`;
+    
+    console.log(`Haciendo petición a: ${fullUrl}`, options);
     
     // Si sabemos que no está disponible, simular fallo silenciosamente
     if (esEndpointNoDisponible) {
       // Solo mostramos mensaje si estamos en modo debug
-      if (DEBUG_MODE) {
-        console.log(`Omitiendo petición a endpoint no disponible: ${endpoint}`);
-      }
+      console.log(`Omitiendo petición a endpoint no disponible: ${endpoint}`);
       throw new Error(`Endpoint ${endpoint} no disponible`);
     }
     
-    const response = await fetch(`${API_URL}${endpoint}`, {
+    const response = await fetch(fullUrl, {
       ...options,
       headers: {
         ...getAuthHeaders(),
@@ -121,16 +125,11 @@ const apiRequest = async (endpoint, options = {}) => {
       }
     });
     
-    if (DEBUG_MODE && !esEndpointNoDisponible) {
-      console.log(`Respuesta de ${endpoint}:`, response.status, response.statusText);
-    }
+    console.log(`Respuesta de ${endpoint}:`, response.status, response.statusText);
     
     return await handleResponse(response);
   } catch (error) {
-    // Solo registrar errores para endpoints que deberían funcionar y en modo debug
-    if (DEBUG_MODE && !esEndpointNoDisponible) {
-      console.error(`Error en petición a ${endpoint}:`, error);
-    }
+    console.error(`Error en petición a ${endpoint}:`, error);
     throw error;
   }
 };
