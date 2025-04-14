@@ -7,6 +7,7 @@ const connectDB = require('./src/config/db');
 const authRoutes = require('./src/routes/auth');
 const postRoutes = require('./src/routes/posts');
 const userRoutes = require('./src/routes/users');
+const friendRoutes = require('./src/routes/friends');
 
 const app = express();
 
@@ -62,6 +63,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/api/auth', authRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/friends', friendRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

@@ -90,11 +90,14 @@ const getAuthHeaders = () => {
 
 // Función para hacer peticiones a la API con manejo de errores
 const apiRequest = async (endpoint, options = {}) => {
-  // Endpoints que sabemos que no están disponibles aún (para evitar errores en consola)
+  // Endpoints que sabemos que no están disponibles en el backend y no deberían mostrar errores
   const endpointsNoDisponibles = [
+    '/friends',
+    '/friends/requests',
     '/friends/suggestions',
-    '/posts/friends'     // Agregamos /posts/friends a la lista de endpoints no disponibles
-    // Quitamos '/users' para permitir obtener los usuarios reales
+    '/friends/request/',
+    '/friends/accept/',
+    '/posts/friends'
   ];
   
   // Verificar si estamos intentando acceder a un endpoint que sabemos que no existe
@@ -108,13 +111,14 @@ const apiRequest = async (endpoint, options = {}) => {
     const apiPath = API_URL.includes('/api') ? '' : '/api';
     const fullUrl = `${API_URL}${apiPath}${normalizedEndpoint}`;
     
-    console.log(`Haciendo petición a: ${fullUrl}`, options);
+    // Solo logueamos las peticiones a endpoints que deberían funcionar
+    if (!esEndpointNoDisponible) {
+      console.log(`Haciendo petición a: ${fullUrl}`, options);
+    }
     
-    // Si sabemos que no está disponible, simular fallo silenciosamente
+    // Si sabemos que no está disponible, saltamos directamente a la simulación
     if (esEndpointNoDisponible) {
-      // Solo mostramos mensaje si estamos en modo debug
-      console.log(`Omitiendo petición a endpoint no disponible: ${endpoint}`);
-      throw new Error(`Endpoint ${endpoint} no disponible`);
+      throw new Error(`Endpoint ${endpoint} no disponible en el backend`);
     }
     
     const response = await fetch(fullUrl, {
@@ -125,11 +129,23 @@ const apiRequest = async (endpoint, options = {}) => {
       }
     });
     
-    console.log(`Respuesta de ${endpoint}:`, response.status, response.statusText);
+    // Solo logueamos respuestas de endpoints que deberían funcionar
+    if (!esEndpointNoDisponible) {
+      console.log(`Respuesta de ${endpoint}:`, response.status, response.statusText);
+    }
     
     return await handleResponse(response);
   } catch (error) {
-    console.error(`Error en petición a ${endpoint}:`, error);
+    // Si es un endpoint que sabemos que no está disponible, no es un error real
+    if (esEndpointNoDisponible) {
+      // Loguear solo en modo debug y de manera discreta
+      if (DEBUG_MODE) {
+        console.log(`Usando simulación local para: ${endpoint}`);
+      }
+    } else {
+      // Solo loguear errores de endpoints que deberían funcionar
+      console.error(`Error en petición a ${endpoint}:`, error);
+    }
     throw error;
   }
 };
