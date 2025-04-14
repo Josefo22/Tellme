@@ -19,12 +19,19 @@ if (!fs.existsSync(uploadsDir)) {
 // Connect to database
 connectDB();
 
-// Configurar CORS
+// Configurar CORS - asegurarse de que no haya barras finales en las URLs
+const normalizeOrigin = (url) => url ? url.replace(/\/$/, '') : url;
+
+// Si FRONTEND_URL tiene una barra final, la quitamos
+if (process.env.FRONTEND_URL) {
+  process.env.FRONTEND_URL = normalizeOrigin(process.env.FRONTEND_URL);
+}
+
 const allowedOrigins = process.env.NODE_ENV === 'production'
-  ? [process.env.FRONTEND_URL || 'https://app-pro.vercel.app']
+  ? [process.env.FRONTEND_URL || 'https://app-pro-ivory.vercel.app']
   : ['http://localhost:4321'];
 
-console.log('CORS allowed origins:', allowedOrigins);
+console.log('CORS allowed origins:', allowedOrigins.map(origin => normalizeOrigin(origin)));
 
 // Middleware
 app.use(cors({
@@ -32,11 +39,16 @@ app.use(cors({
     // Permitir solicitudes sin origin (como las aplicaciones móviles o curl)
     if (!origin) return callback(null, true);
     
-    if (allowedOrigins.indexOf(origin) !== -1) {
+    // Normalizar el origen eliminando cualquier barra final
+    const normalizedOrigin = normalizeOrigin(origin);
+    const normalizedAllowedOrigins = allowedOrigins.map(o => normalizeOrigin(o));
+    
+    if (normalizedAllowedOrigins.includes(normalizedOrigin)) {
       callback(null, true);
     } else {
       console.warn(`Origen no permitido: ${origin}`);
-      callback(null, true); // Permitir de todos modos en caso de problemas
+      // En producción permitimos todos los orígenes para depurar el problema
+      callback(null, true);
     }
   },
   credentials: true

@@ -5,7 +5,9 @@ const getApiUrl = () => {
   
   if (isProduction) {
     // URL para producción - usar la variable de entorno pública de Astro
-    return import.meta.env.PUBLIC_API_URL || 'https://app-pro-backend.onrender.com/';
+    const apiUrl = import.meta.env.PUBLIC_API_URL || 'https://app-pro-backend.onrender.com/api';
+    // Asegurarse de que no hay barra final duplicada
+    return apiUrl.endsWith('/') ? apiUrl.slice(0, -1) : apiUrl;
   } else {
     // URL para desarrollo local
     return 'http://localhost:5000/api';
@@ -20,8 +22,12 @@ const DEBUG_MODE = false; // Cambiamos a false para evitar tantos mensajes en co
 // Función para manejar las respuestas de la API
 const handleResponse = async (response) => {
   try {
+    // Para diagnóstico en producción, mostramos siempre la URL que falló
+    const requestUrl = response.url;
+    
     // Verificar si la respuesta es JSON
     const contentType = response.headers.get('content-type');
+    
     if (contentType && contentType.includes('application/json')) {
       const data = await response.json();
       
@@ -32,17 +38,22 @@ const handleResponse = async (response) => {
       
       return data;
     } else {
-      // Si no es JSON, obtener el texto de la respuesta pero no mostrar en consola
+      // Si no es JSON, obtener el texto de la respuesta
       const text = await response.text();
-      if (DEBUG_MODE) {
-        console.error('Respuesta no JSON:', text);
-      }
-      throw new Error('El servidor no devolvió datos JSON válidos');
+      
+      // En caso de error, incluir más información para diagnóstico
+      console.error('Respuesta no JSON:', {
+        url: requestUrl,
+        status: response.status,
+        contentType: contentType || 'No content-type',
+        textLength: text.length,
+        textPreview: text.substring(0, 100) + (text.length > 100 ? '...' : '')
+      });
+      
+      throw new Error(`El servidor no devolvió datos JSON válidos (Status: ${response.status})`);
     }
   } catch (error) {
-    if (DEBUG_MODE) {
-      console.error('Error al procesar la respuesta:', error);
-    }
+    console.error('Error al procesar la respuesta:', error);
     throw error;
   }
 };
