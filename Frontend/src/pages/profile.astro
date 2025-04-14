@@ -11,11 +11,10 @@ import LoadingTransition from '../components/LoadingTransition.astro';
       <div class="max-w-7xl mx-auto px-4">
         <div class="flex justify-between items-center h-16">
           <div class="flex items-center">
-            <h1 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-600">TellMe</h1>
-            <a href="/feed">
-              <div class="ml-6 relative">
-                <input 
-                  type="text" 
+            <a href="/feed" class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-600">TellMe</a>
+            <div class="hidden md:block ml-6 relative">
+              <input 
+                type="text" 
                 placeholder="Buscar en TellMe" 
                 class="bg-purple-50 rounded-full py-2 pl-10 pr-4 text-sm w-64 focus:outline-none focus:ring-2 focus:ring-purple-300 transition-all"
               >
@@ -25,7 +24,8 @@ import LoadingTransition from '../components/LoadingTransition.astro';
             </div>
           </div>
           
-          <div class="flex items-center space-x-3">
+          <!-- Desktop menu -->
+          <div class="hidden md:flex items-center space-x-3">
             <a href="/profile" class="p-2 rounded-full hover:bg-purple-100 transition-colors relative">
               <span class="sr-only">Perfil</span>
               <svg class="h-6 w-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -39,6 +39,43 @@ import LoadingTransition from '../components/LoadingTransition.astro';
               </svg>
             </button>
           </div>
+          
+          <!-- Mobile menu button -->
+          <div class="md:hidden flex items-center">
+            <button id="mobile-menu-button" class="p-2 rounded-full hover:bg-purple-100 transition-colors">
+              <svg class="h-6 w-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Mobile menu (hidden by default) -->
+        <div id="mobile-menu" class="md:hidden hidden pb-3">
+          <div class="px-2 pt-2 pb-3 space-y-1">
+            <div class="relative mb-3">
+              <input 
+                type="text" 
+                placeholder="Buscar en TellMe" 
+                class="bg-purple-50 rounded-full py-2 pl-10 pr-4 text-sm w-full focus:outline-none focus:ring-2 focus:ring-purple-300 transition-all"
+              >
+              <svg class="h-4 w-4 text-purple-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+            <a href="/feed" class="flex items-center px-3 py-2 rounded-md hover:bg-purple-50 transition-colors">
+              <svg class="h-6 w-6 text-purple-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+              </svg>
+              <span>Feed</span>
+            </a>
+            <button id="mobile-logoutBtn" class="w-full flex items-center px-3 py-2 rounded-md hover:bg-purple-50 transition-colors">
+              <svg class="h-6 w-6 text-purple-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              <span>Cerrar sesion</span>
+            </button>
+          </div>
         </div>
       </div>
     </nav>
@@ -47,16 +84,16 @@ import LoadingTransition from '../components/LoadingTransition.astro';
     <main class="pt-20 pb-8">
       <div class="max-w-2xl mx-auto px-4 sm:px-6">
         <!-- Profile Header with Cover -->
-        <div class="bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-xl mb-6 border border-purple-100">
+        <div class="bg-white/80 backdrop-blur-sm p-4 sm:p-6 rounded-2xl shadow-xl mb-6 border border-purple-100">
           <div class="relative">
             <!-- Foto de perfil y botones de acción -->
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
               <div class="flex items-start mb-4 sm:mb-0">
                 <div class="relative">
-                  <div class="w-24 h-24 rounded-full bg-purple-100 relative overflow-hidden">
+                  <div class="w-20 sm:w-24 h-20 sm:h-24 rounded-full bg-purple-100 relative overflow-hidden">
                     <img id="profilePictureImg" class="w-full h-full object-cover hidden" src="" alt="Foto de perfil">
                     <div id="profilePlaceholderIcon" class="w-full h-full flex items-center justify-center text-purple-400">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-10 sm:h-12 w-10 sm:w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                       </svg>
                     </div>
@@ -94,11 +131,11 @@ import LoadingTransition from '../components/LoadingTransition.astro';
               </div>
               
               <div id="bioDisplayContainer" class="min-h-[60px]">
-                <p id="userBio" class="text-gray-700 whitespace-pre-line">Cargando...</p>
+                <p id="userBio" class="text-gray-700 whitespace-pre-line text-sm sm:text-base">Cargando...</p>
               </div>
               
               <div id="bioEditContainer" class="hidden">
-                <textarea id="quickEditBio" rows="3" class="w-full p-2 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400 bg-white"></textarea>
+                <textarea id="quickEditBio" rows="3" class="w-full p-2 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400 bg-white text-sm sm:text-base"></textarea>
                 <div class="flex justify-end mt-2 space-x-2">
                   <button id="cancelBioEditBtn" class="px-3 py-1 text-sm border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors">
                     Cancelar
@@ -144,18 +181,18 @@ import LoadingTransition from '../components/LoadingTransition.astro';
         <!-- Profile Stats -->
         <div class="bg-white/80 backdrop-blur-sm p-4 rounded-xl shadow-lg border border-white/20 mb-6">
           <h3 class="text-lg font-semibold text-gray-800 mb-3 border-b border-gray-100 pb-2">Estadisticas del Perfil</h3>
-          <div class="grid grid-cols-3 gap-6">
-            <div class="text-center p-3 hover:bg-purple-50 rounded-lg transition-all cursor-pointer">
-              <p class="text-3xl font-bold text-purple-600" id="postsCount">0</p>
-              <p class="text-sm text-gray-600 font-medium">Publicaciones</p>
+          <div class="grid grid-cols-3 gap-3 sm:gap-6">
+            <div class="text-center p-2 sm:p-3 hover:bg-purple-50 rounded-lg transition-all cursor-pointer">
+              <p class="text-2xl sm:text-3xl font-bold text-purple-600" id="postsCount">0</p>
+              <p class="text-xs sm:text-sm text-gray-600 font-medium">Publicaciones</p>
             </div>
-            <div class="text-center p-3 hover:bg-purple-50 rounded-lg transition-all cursor-pointer">
-              <p class="text-3xl font-bold text-purple-600" id="likesCount">0</p>
-              <p class="text-sm text-gray-600 font-medium">Me gusta</p>
+            <div class="text-center p-2 sm:p-3 hover:bg-purple-50 rounded-lg transition-all cursor-pointer">
+              <p class="text-2xl sm:text-3xl font-bold text-purple-600" id="likesCount">0</p>
+              <p class="text-xs sm:text-sm text-gray-600 font-medium">Me gusta</p>
             </div>
-            <div class="text-center p-3 hover:bg-purple-50 rounded-lg transition-all cursor-pointer">
-              <p class="text-3xl font-bold text-purple-600" id="commentsCount">0</p>
-              <p class="text-sm text-gray-600 font-medium">Comentarios</p>
+            <div class="text-center p-2 sm:p-3 hover:bg-purple-50 rounded-lg transition-all cursor-pointer">
+              <p class="text-2xl sm:text-3xl font-bold text-purple-600" id="commentsCount">0</p>
+              <p class="text-xs sm:text-sm text-gray-600 font-medium">Comentarios</p>
             </div>
           </div>
           <div id="statsError" class="hidden mt-2 text-center text-sm text-red-500"></div>
@@ -169,7 +206,7 @@ import LoadingTransition from '../components/LoadingTransition.astro';
           <div class="mb-6 p-4 bg-gray-50 rounded-lg">
             <textarea 
               id="newPostContent"
-              class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-400"
+              class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-400 text-sm sm:text-base"
               placeholder="Que hay de nuevo?"
               rows="3"
             ></textarea>
@@ -180,13 +217,13 @@ import LoadingTransition from '../components/LoadingTransition.astro';
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
-                    Foto
+                    <span class="hidden sm:inline">Foto</span>
                   </span>
                 </button>
               </div>
               <button 
                 id="createPostBtn"
-                class="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg font-medium hover:opacity-90 transition-all"
+                class="px-3 sm:px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg font-medium hover:opacity-90 transition-all text-sm sm:text-base"
               >
                 Publicar
               </button>
@@ -212,6 +249,26 @@ import LoadingTransition from '../components/LoadingTransition.astro';
 <script>
    // @ts-ignore
    import { auth, posts, utils, users } from '../utils/api.js';
+
+  // Control del menú móvil
+  const mobileMenuButton = document.getElementById('mobile-menu-button');
+  const mobileMenu = document.getElementById('mobile-menu');
+  const mobileLogoutBtn = document.getElementById('mobile-logoutBtn');
+  
+  // Alternar menú móvil
+  if (mobileMenuButton && mobileMenu) {
+    mobileMenuButton.addEventListener('click', () => {
+      mobileMenu.classList.toggle('hidden');
+    });
+  }
+  
+  // Asegurarse de que el botón de logout móvil funcione igual que el de escritorio
+  if (mobileLogoutBtn) {
+    mobileLogoutBtn.addEventListener('click', () => {
+      auth.logout();
+      window.location.href = '/';
+    });
+  }
 
   // Verificar si el usuario está autenticado
   if (!utils.isAuthenticated()) {
