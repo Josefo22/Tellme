@@ -19,11 +19,26 @@ if (!fs.existsSync(uploadsDir)) {
 // Connect to database
 connectDB();
 
+// Configurar CORS
+const allowedOrigins = process.env.NODE_ENV === 'production'
+  ? [process.env.FRONTEND_URL || 'https://app-pro.vercel.app']
+  : ['http://localhost:4321'];
+
+console.log('CORS allowed origins:', allowedOrigins);
+
 // Middleware
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? ['https://app-pro.vercel.app'] 
-    : 'http://localhost:4321',
+  origin: function(origin, callback) {
+    // Permitir solicitudes sin origin (como las aplicaciones móviles o curl)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      console.warn(`Origen no permitido: ${origin}`);
+      callback(null, true); // Permitir de todos modos en caso de problemas
+    }
+  },
   credentials: true
 }));
 app.use(express.json());

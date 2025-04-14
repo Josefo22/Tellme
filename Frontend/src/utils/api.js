@@ -4,8 +4,8 @@ const getApiUrl = () => {
   const isProduction = window.location.hostname !== 'localhost' && !window.location.hostname.includes('127.0.0.1');
   
   if (isProduction) {
-    // URL para producción
-    return 'https://api.tellme-app.com/api';
+    // URL para producción - usar la variable de entorno pública de Astro
+    return import.meta.env.PUBLIC_API_URL || 'https://app-pro-backend.onrender.com/';
   } else {
     // URL para desarrollo local
     return 'http://localhost:5000/api';
