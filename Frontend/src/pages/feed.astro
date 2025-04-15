@@ -627,6 +627,19 @@ import LoadingTransition from '../components/LoadingTransition.astro';
   .animate-fadeIn {
     animation: fadeIn 0.3s ease-out forwards;
   }
+  
+  /* Transición para el menú móvil */
+  #mobile-menu {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out, opacity 0.2s ease-out;
+    opacity: 0;
+  }
+  
+  #mobile-menu:not(.hidden) {
+    max-height: 300px;
+    opacity: 1;
+  }
 </style>
 
 <script>
@@ -709,6 +722,48 @@ import LoadingTransition from '../components/LoadingTransition.astro';
     submitPostBtn = document.getElementById('submitPostBtn');
     friendsContainer = document.querySelector('.space-y-4');
     mobileFriendsContainer = document.getElementById('mobile-friendsList');
+    
+    // Configurar el menú hamburguesa para móviles
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+    
+    if (mobileMenuButton && mobileMenu) {
+      // Función para alternar la visibilidad del menú
+      const toggleMobileMenu = () => {
+        if (mobileMenu.classList.contains('hidden')) {
+          mobileMenu.classList.remove('hidden');
+          setTimeout(() => {
+            document.addEventListener('click', closeMobileMenuOutside);
+          }, 100);
+        } else {
+          mobileMenu.classList.add('hidden');
+          document.removeEventListener('click', closeMobileMenuOutside);
+        }
+      };
+      
+      // Función para cerrar el menú al hacer clic fuera de él
+      const closeMobileMenuOutside = (event: MouseEvent) => {
+        if (!mobileMenuButton.contains(event.target as Node) && 
+            !mobileMenu.contains(event.target as Node)) {
+          mobileMenu.classList.add('hidden');
+          document.removeEventListener('click', closeMobileMenuOutside);
+        }
+      };
+      
+      // Configurar evento de clic en el botón hamburguesa
+      mobileMenuButton.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleMobileMenu();
+      });
+      
+      // Configurar eventos para cerrar el menú al hacer clic en cualquier enlace o botón del menú
+      const mobileMenuLinks = mobileMenu.querySelectorAll('a, button');
+      mobileMenuLinks.forEach(link => {
+        link.addEventListener('click', () => {
+          mobileMenu.classList.add('hidden');
+        });
+      });
+    }
     
     console.log('Elementos DOM inicializados:', {
       postsContainer,
